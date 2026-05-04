@@ -10,7 +10,6 @@ services:
   # Backend Spring Boot Application 
   - type: web
     name: pe-grades-backend
-    env: docker
     plan: free
     region: frankfurt
     buildCommand: mvn clean package -DskipTests
