@@ -10,7 +10,7 @@ services:
   # Backend Spring Boot Application
   - type: web
     name: pe-grades-backend
-    runtime: java
+    env: docker
     plan: free
     region: frankfurt
     buildCommand: mvn clean package -DskipTests
@@ -58,9 +58,8 @@ services:
   # Frontend React Application
   - type: web
     name: pe-grades-frontend
-    runtime: static
+    env: static
     plan: free
-    region: frankfurt
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     routes:
