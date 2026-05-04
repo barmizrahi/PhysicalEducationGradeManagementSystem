@@ -7,10 +7,10 @@ databases:
     region: frankfurt
 
 services:
-  # Backend Spring Boot Application
+  # Backend Spring Boot Application 
   - type: web
     name: pe-grades-backend
-    env: java
+    env: docker
     plan: free
     region: frankfurt
     buildCommand: mvn clean package -DskipTests
