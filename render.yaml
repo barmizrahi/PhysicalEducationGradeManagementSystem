@@ -10,10 +10,9 @@ services:
   # Backend Spring Boot Application 
   - type: web
     name: pe-grades-backend
+    env: docker
     plan: free
     region: frankfurt
-    buildCommand: mvn clean package -DskipTests
-    startCommand: java -jar target/grade-management-system-0.0.1-SNAPSHOT.jar
     healthCheckPath: /actuator/health
     envVars:
       - key: DATABASE_URL
