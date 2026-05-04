@@ -13,10 +13,10 @@ import java.util.ArrayList;
 
 /**
  * UserDetailsService implementation for loading teacher details.
- * Used by Spring Security for authentication.
+ * Used by Spring Security for authentication with Google OAuth.
  * 
  * Requirements:
- * - 13.1: Load teacher details for authentication
+ * - Load teacher details for authentication by email
  */
 @Service
 public class TeacherDetailsService implements UserDetailsService {
@@ -29,16 +29,16 @@ public class TeacherDetailsService implements UserDetailsService {
     }
     
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Find teacher by username
-        Teacher teacher = teacherRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Teacher not found: " + username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Find teacher by email (email is used as username in OAuth flow)
+        Teacher teacher = teacherRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Teacher not found: " + email));
         
-        // Return UserDetails with username, password, and empty authorities
+        // Return UserDetails with email as username, no password (OAuth), and empty authorities
         // We don't use role-based authorization, just authentication
         return User.builder()
-                .username(teacher.getUsername())
-                .password(teacher.getPasswordHash())
+                .username(teacher.getEmail())
+                .password("") // No password for OAuth users
                 .authorities(new ArrayList<>())
                 .build();
     }

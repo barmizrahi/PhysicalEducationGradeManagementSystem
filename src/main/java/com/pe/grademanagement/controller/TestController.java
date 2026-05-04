@@ -67,7 +67,20 @@ public class TestController {
             // Save test
             Test createdTest = testService.createTest(test);
             
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdTest);
+            // Convert to DTO to avoid circular references
+            java.util.Map<String, Object> dto = new java.util.HashMap<>();
+            dto.put("id", createdTest.getId());
+            dto.put("name", createdTest.getName());
+            dto.put("calculationType", createdTest.getCalculationType());
+            dto.put("unitType", createdTest.getUnitType());
+            dto.put("maxValue", createdTest.getMaxValue());
+            dto.put("targetValue", createdTest.getTargetValue());
+            dto.put("penaltyPerUnit", createdTest.getPenaltyPerUnit());
+            dto.put("createdBy", createdTest.getCreatedBy().getId());
+            dto.put("createdAt", createdTest.getCreatedAt() != null ? createdTest.getCreatedAt().toString() : null);
+            dto.put("updatedAt", createdTest.getUpdatedAt() != null ? createdTest.getUpdatedAt().toString() : null);
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(dto);
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
@@ -120,7 +133,20 @@ public class TestController {
             // Update test
             Test result = testService.updateTest(id, updatedTest);
             
-            return ResponseEntity.ok(result);
+            // Convert to DTO to avoid circular references
+            java.util.Map<String, Object> dto = new java.util.HashMap<>();
+            dto.put("id", result.getId());
+            dto.put("name", result.getName());
+            dto.put("calculationType", result.getCalculationType());
+            dto.put("unitType", result.getUnitType());
+            dto.put("maxValue", result.getMaxValue());
+            dto.put("targetValue", result.getTargetValue());
+            dto.put("penaltyPerUnit", result.getPenaltyPerUnit());
+            dto.put("createdBy", result.getCreatedBy().getId());
+            dto.put("createdAt", result.getCreatedAt() != null ? result.getCreatedAt().toString() : null);
+            dto.put("updatedAt", result.getUpdatedAt() != null ? result.getUpdatedAt().toString() : null);
+            
+            return ResponseEntity.ok(dto);
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
@@ -195,7 +221,25 @@ public class TestController {
             // Get tests for class
             List<Test> tests = testService.getTestsForClass(classId);
             
-            return ResponseEntity.ok(tests);
+            // Convert to DTOs to avoid circular references
+            List<java.util.Map<String, Object>> testDTOs = tests.stream()
+                .map(test -> {
+                    java.util.Map<String, Object> dto = new java.util.HashMap<>();
+                    dto.put("id", test.getId());
+                    dto.put("name", test.getName());
+                    dto.put("calculationType", test.getCalculationType());
+                    dto.put("unitType", test.getUnitType());
+                    dto.put("maxValue", test.getMaxValue());
+                    dto.put("targetValue", test.getTargetValue());
+                    dto.put("penaltyPerUnit", test.getPenaltyPerUnit());
+                    dto.put("createdBy", test.getCreatedBy().getId());
+                    dto.put("createdAt", test.getCreatedAt() != null ? test.getCreatedAt().toString() : null);
+                    dto.put("updatedAt", test.getUpdatedAt() != null ? test.getUpdatedAt().toString() : null);
+                    return dto;
+                })
+                .collect(java.util.stream.Collectors.toList());
+            
+            return ResponseEntity.ok(testDTOs);
             
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -203,6 +247,91 @@ public class TestController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorResponse("Failed to retrieve tests: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Get all tests created by the authenticated teacher.
+     * 
+     * @param authentication Spring Security authentication object
+     * @return List of all tests created by the teacher
+     */
+    @GetMapping
+    public ResponseEntity<?> getAllTests(Authentication authentication) {
+        try {
+            // Get authenticated teacher
+            Teacher teacher = getAuthenticatedTeacher(authentication);
+            
+            // Get all tests for this teacher
+            List<Test> tests = testService.getTestsByTeacher(teacher.getId());
+            
+            // Convert to DTOs to avoid circular references
+            List<java.util.Map<String, Object>> testDTOs = tests.stream()
+                .map(test -> {
+                    java.util.Map<String, Object> dto = new java.util.HashMap<>();
+                    dto.put("id", test.getId());
+                    dto.put("name", test.getName());
+                    dto.put("calculationType", test.getCalculationType());
+                    dto.put("unitType", test.getUnitType());
+                    dto.put("maxValue", test.getMaxValue());
+                    dto.put("targetValue", test.getTargetValue());
+                    dto.put("penaltyPerUnit", test.getPenaltyPerUnit());
+                    dto.put("createdBy", test.getCreatedBy().getId());
+                    dto.put("createdAt", test.getCreatedAt() != null ? test.getCreatedAt().toString() : null);
+                    dto.put("updatedAt", test.getUpdatedAt() != null ? test.getUpdatedAt().toString() : null);
+                    return dto;
+                })
+                .collect(java.util.stream.Collectors.toList());
+            
+            return ResponseEntity.ok(testDTOs);
+            
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to retrieve tests: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Delete a test configuration.
+     * Requires authentication - only the teacher who created the test can delete it.
+     * Cascade deletes all test assignments and test results.
+     * 
+     * @param id Test ID
+     * @param authentication Spring Security authentication object
+     * @return Success message with HTTP 200 status
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTest(@PathVariable Long id,
+                                       Authentication authentication) {
+        try {
+            // Get authenticated teacher
+            Teacher teacher = getAuthenticatedTeacher(authentication);
+            
+            // Verify test exists and teacher has access
+            Test test = testService.getTestById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Test not found with ID: " + id));
+            
+            if (!test.getCreatedBy().getId().equals(teacher.getId())) {
+                throw new AccessDeniedException("You do not have permission to delete this test");
+            }
+            
+            // Delete test (cascade deletes assignments and results)
+            testService.deleteTest(id);
+            
+            return ResponseEntity.ok(new MessageResponse("Test deleted successfully"));
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ErrorResponse("Invalid request: " + e.getMessage()));
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to delete test: " + e.getMessage()));
         }
     }
     
@@ -218,10 +347,10 @@ public class TestController {
             throw new AccessDeniedException("No authenticated user found");
         }
         
-        String username = authentication.getName();
+        String email = authentication.getName();
         
-        return teacherRepository.findByUsername(username)
-                .orElseThrow(() -> new AccessDeniedException("Teacher not found for username: " + username));
+        return teacherRepository.findByEmail(email)
+                .orElseThrow(() -> new AccessDeniedException("Teacher not found for email: " + email));
     }
     
     /**

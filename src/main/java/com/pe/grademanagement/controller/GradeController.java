@@ -62,7 +62,23 @@ public class GradeController {
             // Authorization is handled by GradeService
             List<TestResult> results = gradeService.getTestResultsForClass(classId, testId);
             
-            return ResponseEntity.ok(results);
+            // Convert to DTOs to avoid circular references
+            List<java.util.Map<String, Object>> resultDTOs = results.stream()
+                .map(result -> {
+                    java.util.Map<String, Object> dto = new java.util.HashMap<>();
+                    dto.put("id", result.getId());
+                    dto.put("studentId", result.getStudent().getId());
+                    dto.put("testId", result.getTest().getId());
+                    dto.put("rawResult", result.getRawResult());
+                    dto.put("calculatedGrade", result.getCalculatedGrade());
+                    dto.put("notes", result.getNotes());
+                    dto.put("createdAt", result.getCreatedAt() != null ? result.getCreatedAt().toString() : null);
+                    dto.put("updatedAt", result.getUpdatedAt() != null ? result.getUpdatedAt().toString() : null);
+                    return dto;
+                })
+                .collect(java.util.stream.Collectors.toList());
+            
+            return ResponseEntity.ok(resultDTOs);
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
@@ -95,7 +111,18 @@ public class GradeController {
             // Save test result (authorization handled by GradeService)
             TestResult savedResult = gradeService.saveTestResult(testResult);
             
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedResult);
+            // Convert to DTO to avoid circular references
+            java.util.Map<String, Object> dto = new java.util.HashMap<>();
+            dto.put("id", savedResult.getId());
+            dto.put("studentId", savedResult.getStudent().getId());
+            dto.put("testId", savedResult.getTest().getId());
+            dto.put("rawResult", savedResult.getRawResult());
+            dto.put("calculatedGrade", savedResult.getCalculatedGrade());
+            dto.put("notes", savedResult.getNotes());
+            dto.put("createdAt", savedResult.getCreatedAt() != null ? savedResult.getCreatedAt().toString() : null);
+            dto.put("updatedAt", savedResult.getUpdatedAt() != null ? savedResult.getUpdatedAt().toString() : null);
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(dto);
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
@@ -131,7 +158,23 @@ public class GradeController {
             // Bulk save test results (authorization handled by GradeService)
             List<TestResult> savedResults = gradeService.bulkSaveTestResults(testResults);
             
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedResults);
+            // Convert to DTOs to avoid circular references
+            List<java.util.Map<String, Object>> resultDTOs = savedResults.stream()
+                .map(result -> {
+                    java.util.Map<String, Object> dto = new java.util.HashMap<>();
+                    dto.put("id", result.getId());
+                    dto.put("studentId", result.getStudent().getId());
+                    dto.put("testId", result.getTest().getId());
+                    dto.put("rawResult", result.getRawResult());
+                    dto.put("calculatedGrade", result.getCalculatedGrade());
+                    dto.put("notes", result.getNotes());
+                    dto.put("createdAt", result.getCreatedAt() != null ? result.getCreatedAt().toString() : null);
+                    dto.put("updatedAt", result.getUpdatedAt() != null ? result.getUpdatedAt().toString() : null);
+                    return dto;
+                })
+                .collect(java.util.stream.Collectors.toList());
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(resultDTOs);
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()

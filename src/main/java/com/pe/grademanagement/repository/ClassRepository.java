@@ -69,4 +69,15 @@ public interface ClassRepository extends JpaRepository<Class, Long> {
      * @return true if such a class exists, false otherwise
      */
     boolean existsByNameAndGradeLevelAndTeacherId(String name, String gradeLevel, Long teacherId);
+    
+    /**
+     * Find a class by name, grade level, and teacher.
+     * Used during student import to find or create classes.
+     * 
+     * @param name the class name
+     * @param gradeLevel the grade level
+     * @param teacherId the teacher's ID
+     * @return Optional containing the class if found
+     */
+    java.util.Optional<Class> findByNameAndGradeLevelAndTeacherId(String name, String gradeLevel, Long teacherId);
 }

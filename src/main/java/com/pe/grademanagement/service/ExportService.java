@@ -117,8 +117,9 @@ public class ExportService {
             testResults.put(student, studentResults);
         }
         
-        // Generate Excel file
-        return excelExporter.generateMinistryFormatExcel(students, testResults, includeNotes);
+        // Generate Excel file using fixed format (5 columns with integer grades)
+        // Requirements: 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8, 14.9, 14.10
+        return excelExporter.generateFixedFormatExcel(students, testResults);
     }
     
     /**
@@ -134,9 +135,9 @@ public class ExportService {
             throw new AccessDeniedException("No authenticated user found");
         }
         
-        String username = authentication.getName();
+        String email = authentication.getName();
         
-        return teacherRepository.findByUsername(username)
-                .orElseThrow(() -> new AccessDeniedException("Teacher not found for username: " + username));
+        return teacherRepository.findByEmail(email)
+                .orElseThrow(() -> new AccessDeniedException("Teacher not found for email: " + email));
     }
 }

@@ -11,27 +11,36 @@ import java.util.Optional;
  * Provides CRUD operations and custom query methods for teacher data access.
  * 
  * Requirements:
- * - 13.1: Support teacher authentication
- * - 13.2: Associate teachers with their assigned classes
+ * - Support teacher authentication via Google OAuth
+ * - Associate teachers with their assigned classes
  */
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
     
     /**
-     * Find a teacher by username.
-     * Used for authentication.
+     * Find a teacher by email address.
+     * Used for authentication and user identification.
      * 
-     * @param username the teacher's username
+     * @param email the teacher's email address
      * @return Optional containing the teacher if found, empty otherwise
      */
-    Optional<Teacher> findByUsername(String username);
+    Optional<Teacher> findByEmail(String email);
     
     /**
-     * Check if a teacher exists with the given username.
+     * Find a teacher by Google ID.
+     * Used for OAuth authentication.
+     * 
+     * @param googleId the teacher's Google user ID
+     * @return Optional containing the teacher if found, empty otherwise
+     */
+    Optional<Teacher> findByGoogleId(String googleId);
+    
+    /**
+     * Check if a teacher exists with the given email.
      * Useful for validation during teacher creation.
      * 
-     * @param username the username to check
-     * @return true if a teacher with this username exists, false otherwise
+     * @param email the email to check
+     * @return true if a teacher with this email exists, false otherwise
      */
-    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

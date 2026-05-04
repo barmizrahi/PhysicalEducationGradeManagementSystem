@@ -41,14 +41,15 @@ public class JwtUtil {
     /**
      * Generate JWT token for a teacher.
      * 
-     * @param username the teacher's username
+     * @param email the teacher's email address
      * @param teacherId the teacher's ID
      * @return JWT token string
      */
-    public String generateToken(String username, Long teacherId) {
+    public String generateToken(String email, Long teacherId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("teacherId", teacherId);
-        return createToken(claims, username);
+        claims.put("email", email);
+        return createToken(claims, email);
     }
     
     /**
@@ -72,13 +73,23 @@ public class JwtUtil {
     }
     
     /**
-     * Extract username from JWT token.
+     * Extract email from JWT token.
      * 
      * @param token JWT token string
-     * @return username (subject) from the token
+     * @return email (subject) from the token
+     */
+    public String extractEmail(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+    
+    /**
+     * Extract username from JWT token (alias for extractEmail for backward compatibility).
+     * 
+     * @param token JWT token string
+     * @return email (subject) from the token
      */
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractEmail(token);
     }
     
     /**
@@ -140,14 +151,14 @@ public class JwtUtil {
     }
     
     /**
-     * Validate JWT token against username.
+     * Validate JWT token against email.
      * 
      * @param token JWT token string
-     * @param username username to validate against
-     * @return true if token is valid for the username, false otherwise
+     * @param email email to validate against
+     * @return true if token is valid for the email, false otherwise
      */
-    public Boolean validateToken(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+    public Boolean validateToken(String token, String email) {
+        final String extractedEmail = extractEmail(token);
+        return (extractedEmail.equals(email) && !isTokenExpired(token));
     }
 }

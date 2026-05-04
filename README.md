@@ -119,27 +119,132 @@ The frontend will be available at http://localhost:3000
 ## API Documentation
 
 ### Authentication
-- `POST /api/auth/login` - Teacher login
-- `POST /api/auth/logout` - Teacher logout
+
+#### Google OAuth Authentication
+- **POST** `/api/auth/google/callback` - Complete Google OAuth authentication
+  - **Request Body:**
+    ```json
+    {
+      "code": "authorization_code_from_google"
+    }
+    ```
+  - **Response (200 OK):**
+    ```json
+    {
+      "token": "jwt_token_string",
+      "user": {
+        "id": 1,
+        "email": "teacher@education.gov.il",
+        "name": "Teacher Name",
+        "picture": "https://profile-picture-url"
+      }
+    }
+    ```
+  - **Error Response (401 Unauthorized):**
+    ```json
+    {
+      "error": "אימות Google נכשל: error_message"
+    }
+    ```
+
+- **POST** `/api/auth/logout` - Logout (client-side token removal)
+  - **Response (200 OK):**
+    ```json
+    {
+      "message": "התנתקות בוצעה בהצלחה"
+    }
+    ```
 
 ### Student Management
-- `POST /api/students/import` - Import students from Excel
-- `GET /api/students/by-grade-and-class` - Get students grouped
-- `GET /api/students/class/{classId}` - Get students in class
+
+#### Import Students from Excel
+- **POST** `/api/students/import` - Import students from Excel file with fixed 4-column format
+  - **Authentication:** Required (JWT Bearer token)
+  - **Request:** Multipart form data with file parameter
+  - **Excel Format:** Fixed 4 columns in exact order:
+    1. **studentId** - Student ID (text/number)
+    2. **name** - Student Name in Hebrew (text)
+    3. **gradeLevel** - Grade Level: י, יא, or יב (text)
+    4. **className** - Class Name (text)
+  - **Example Excel Data:**
+    | studentId | name | gradeLevel | className |
+    |-----------|------|------------|-----------|
+    | 123456789 | יוסי כהן | יא | א1 |
+    | 987654321 | שרה לוי | יב | ב2 |
+  - **Response (200 OK):**
+    ```json
+    {
+      "studentsCreated": 15,
+      "studentsUpdated": 3,
+      "errors": []
+    }
+    ```
+  - **Error Response (400 Bad Request):**
+    ```json
+    {
+      "message": "קובץ Excel חייב להכיל בדיוק 4 עמודות"
+    }
+    ```
+
+- **GET** `/api/students/by-grade-and-class` - Get students grouped by grade and class
+  - **Authentication:** Required (JWT Bearer token)
+  - **Response:** Map of grade level → class → students
+
+- **GET** `/api/students/class/{classId}` - Get students in specific class
+  - **Authentication:** Required (JWT Bearer token)
+  - **Response:** List of students
 
 ### Test Management
-- `POST /api/tests` - Create test configuration
-- `PUT /api/tests/{id}` - Update test configuration
-- `POST /api/tests/{id}/assign` - Assign test to classes
-- `GET /api/tests/class/{classId}` - Get tests for class
+- **POST** `/api/tests` - Create test configuration
+  - **Authentication:** Required (JWT Bearer token)
+- **PUT** `/api/tests/{id}` - Update test configuration
+  - **Authentication:** Required (JWT Bearer token)
+- **POST** `/api/tests/{id}/assign` - Assign test to classes
+  - **Authentication:** Required (JWT Bearer token)
+- **GET** `/api/tests/class/{classId}` - Get tests for class
+  - **Authentication:** Required (JWT Bearer token)
 
 ### Grade Entry
-- `GET /api/grades/class/{classId}/test/{testId}` - Get results
-- `POST /api/grades` - Save single test result
-- `POST /api/grades/bulk` - Bulk save test results
+- **GET** `/api/grades/class/{classId}/test/{testId}` - Get test results
+  - **Authentication:** Required (JWT Bearer token)
+- **POST** `/api/grades` - Save single test result
+  - **Authentication:** Required (JWT Bearer token)
+- **POST** `/api/grades/bulk` - Bulk save test results
+  - **Authentication:** Required (JWT Bearer token)
 
 ### Export
-- `POST /api/export/excel` - Export grades to Excel
+
+#### Export Grades to Excel
+- **POST** `/api/export/excel` - Export grades to Excel file with fixed 5-column format
+  - **Authentication:** Required (JWT Bearer token)
+  - **Request Body:**
+    ```json
+    {
+      "classIds": [1, 2, 3],
+      "testIds": [10, 11],
+      "includeNotes": false
+    }
+    ```
+  - **Excel Export Format:** Fixed 5 columns in exact order:
+    1. **studentId** - Student ID (text/number)
+    2. **name** - Student Name in Hebrew (text)
+    3. **gradeLevel** - Grade Level: י, יא, or יב (text)
+    4. **className** - Class Name (text)
+    5. **grade** - Final Grade as **integer** (whole number, rounded using standard rounding rules)
+  - **Grade Rounding Rules:**
+    - 87.6 → 88 (rounds up)
+    - 87.4 → 87 (rounds down)
+    - 87.5 → 88 (rounds up, 0.5 and above)
+    - All grades are exported as whole numbers with no decimal points
+  - **Example Excel Output:**
+    | studentId | name | gradeLevel | className | grade |
+    |-----------|------|------------|-----------|-------|
+    | 123456789 | יוסי כהן | יא | א1 | 88 |
+    | 987654321 | שרה לוי | יב | ב2 | 92 |
+  - **Response (200 OK):** Excel file download (application/octet-stream)
+  - **Response Headers:**
+    - `Content-Type: application/octet-stream`
+    - `Content-Disposition: attachment; filename="grades_export_YYYYMMDD_HHMMSS.xlsx"`
 
 ## Testing
 

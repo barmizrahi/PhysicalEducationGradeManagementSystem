@@ -1,5 +1,6 @@
 package com.pe.grademanagement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "students")
+@JsonIgnoreProperties({"testResults", "classEntity.students", "classEntity.teacher.classes"})
 public class Student {
     
     @Id

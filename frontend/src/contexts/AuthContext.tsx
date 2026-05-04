@@ -1,16 +1,18 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import axios from 'axios'
+import { authApi } from '../api'
+import apiClient from '../api/client'
 
 interface User {
   id: number
-  username: string
-  fullName: string
+  email: string
+  name: string
+  picture?: string
 }
 
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (username: string, password: string) => Promise<void>
+  googleLogin: (authorizationCode: string) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
 }
@@ -38,19 +40,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const storedToken = localStorage.getItem('token')
     const storedUser = localStorage.getItem('user')
     
-    if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
-      
-      // Set default authorization header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
+    if (storedToken && storedUser && storedUser !== 'undefined' && storedUser !== 'null') {
+      try {
+        setToken(storedToken)
+        setUser(JSON.parse(storedUser))
+        
+        // Set default authorization header
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
+      } catch (error) {
+        // If parsing fails, clear invalid data
+        console.error('Failed to parse stored user data:', error)
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+      }
     }
   }, [])
 
-  const login = async (username: string, password: string) => {
+  const googleLogin = async (authorizationCode: string) => {
     try {
-      const response = await axios.post('/api/auth/login', { username, password })
-      const { token: newToken, user: newUser } = response.data
+      // Send the frontend redirect URI (where Google redirected after auth)
+      const redirectUri = window.location.origin
+      const response = await authApi.googleCallback({ 
+        code: authorizationCode,
+        redirectUri: redirectUri
+      })
+      
+      // Backend returns: { token, user: { id, email, name, picture } }
+      const newToken = response.token
+      const newUser: User = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.name,
+        picture: response.user.picture,
+      }
       
       setToken(newToken)
       setUser(newUser)
@@ -60,9 +82,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       localStorage.setItem('user', JSON.stringify(newUser))
       
       // Set default authorization header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
     } catch (error) {
-      console.error('Login failed:', error)
+      console.error('Google login failed:', error)
       throw error
     }
   }
@@ -76,13 +98,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem('user')
     
     // Remove authorization header
-    delete axios.defaults.headers.common['Authorization']
+    delete apiClient.defaults.headers.common['Authorization']
   }
 
   const value = {
     user,
     token,
-    login,
+    googleLogin,
     logout,
     isAuthenticated: !!token && !!user,
   }

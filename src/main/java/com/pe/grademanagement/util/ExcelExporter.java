@@ -120,6 +120,61 @@ public class ExcelExporter {
     }
     
     /**
+     * Generates fixed-format Excel file with exactly 6 columns and integer grades.
+     * This is the new Ministry format for grade submission.
+     * 
+     * Excel format (fixed 6 columns):
+     * - Column 1: Student ID
+     * - Column 2: Student Name (Hebrew supported)
+     * - Column 3: Grade Level (י, יא, יב)
+     * - Column 4: Class Name
+     * - Column 5: Grade (final grade as integer, rounded to nearest whole number)
+     * - Column 6: Notes (optional notes about the student's performance)
+     * 
+     * Requirements: 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8
+     * 
+     * @param students List of students to include in export
+     * @param testResults Map of student → test → result
+     * @return Excel file as byte array in fixed Ministry format
+     * @throws IllegalArgumentException if students list is null
+     */
+    public byte[] generateFixedFormatExcel(List<Student> students, 
+                                           Map<Student, Map<Test, TestResult>> testResults) {
+        if (students == null) {
+            throw new IllegalArgumentException("Students list cannot be null");
+        }
+        
+        if (testResults == null) {
+            testResults = new HashMap<>();
+        }
+        
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            
+            Sheet sheet = workbook.createSheet("ציונים");
+            
+            // Create header row with fixed 5 columns
+            createFixedFormatHeaderRow(sheet);
+            
+            // Create data rows for each student
+            int rowNum = 1;
+            for (Student student : students) {
+                createFixedFormatStudentRow(sheet, rowNum++, student, testResults.get(student));
+            }
+            
+            // Auto-size columns for better readability
+            autoSizeFixedFormatColumns(sheet);
+            
+            // Write workbook to byte array
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to generate Excel file", e);
+        }
+    }
+    
+    /**
      * Collects all unique tests from the test results map.
      * 
      * @param testResults Map of student → test → result
@@ -293,6 +348,149 @@ public class ExcelExporter {
         int totalColumns = 4 + numTests + (includeNotes ? 1 : 0);
         
         for (int i = 0; i < totalColumns; i++) {
+            sheet.autoSizeColumn(i);
+            
+            // Add some padding to the auto-sized width
+            int currentWidth = sheet.getColumnWidth(i);
+            sheet.setColumnWidth(i, currentWidth + 500);
+        }
+    }
+    
+    /**
+     * Creates the header row for fixed format export (6 columns with notes).
+     * Requirements: 14.1
+     * 
+     * @param sheet Excel sheet
+     */
+    private void createFixedFormatHeaderRow(Sheet sheet) {
+        Row headerRow = sheet.createRow(0);
+        
+        // Create cell style for headers (bold)
+        CellStyle headerStyle = sheet.getWorkbook().createCellStyle();
+        Font headerFont = sheet.getWorkbook().createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        
+        int colNum = 0;
+        
+        // Fixed 6 columns in order: studentId, name, gradeLevel, className, grade, notes
+        createStyledCell(headerRow, colNum++, HEADER_STUDENT_ID, headerStyle);
+        createStyledCell(headerRow, colNum++, HEADER_STUDENT_NAME, headerStyle);
+        createStyledCell(headerRow, colNum++, HEADER_GRADE_LEVEL, headerStyle);
+        createStyledCell(headerRow, colNum++, HEADER_CLASS_NAME, headerStyle);
+        createStyledCell(headerRow, colNum++, "ציון", headerStyle); // "Grade" in Hebrew
+        createStyledCell(headerRow, colNum++, HEADER_NOTES, headerStyle); // "Notes" in Hebrew
+    }
+    
+    /**
+     * Creates a data row for a single student in fixed format (6 columns with notes).
+     * Calculates the final grade as the average of all test results, rounded to nearest integer.
+     * Requirements: 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8
+     * 
+     * @param sheet Excel sheet
+     * @param rowNum Row number (0-based)
+     * @param student Student entity
+     * @param studentResults Map of test → result for this student (can be null)
+     */
+    private void createFixedFormatStudentRow(Sheet sheet, int rowNum, Student student,
+                                             Map<Test, TestResult> studentResults) {
+        Row row = sheet.createRow(rowNum);
+        
+        int colNum = 0;
+        
+        // Fixed 6 columns: studentId, name, gradeLevel, className, grade, notes
+        createCell(row, colNum++, student.getStudentId() != null ? student.getStudentId() : "");
+        createCell(row, colNum++, student.getName());
+        createCell(row, colNum++, student.getGradeLevel());
+        createCell(row, colNum++, student.getClassEntity() != null ? student.getClassEntity().getName() : "");
+        
+        // Calculate final grade as average of all test results, rounded to nearest integer
+        int finalGrade = calculateFinalGrade(studentResults);
+        createIntegerCell(row, colNum++, finalGrade);
+        
+        // Collect notes from all test results
+        StringBuilder notesBuilder = new StringBuilder();
+        if (studentResults != null && !studentResults.isEmpty()) {
+            for (Map.Entry<Test, TestResult> entry : studentResults.entrySet()) {
+                TestResult result = entry.getValue();
+                if (result != null && result.hasNotes()) {
+                    if (notesBuilder.length() > 0) {
+                        notesBuilder.append("; ");
+                    }
+                    notesBuilder.append(result.getNotes());
+                }
+            }
+        }
+        createCell(row, colNum++, notesBuilder.toString());
+    }
+    
+    /**
+     * Calculates the final grade as the average of all test results.
+     * Rounds to the nearest integer using standard rounding rules (0.5 and above rounds up).
+     * Requirements: 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8
+     * 
+     * @param studentResults Map of test → result for a student (can be null or empty)
+     * @return Final grade as integer (0 if no results)
+     */
+    private int calculateFinalGrade(Map<Test, TestResult> studentResults) {
+        if (studentResults == null || studentResults.isEmpty()) {
+            return 0;
+        }
+        
+        // Calculate average of all test grades
+        BigDecimal sum = BigDecimal.ZERO;
+        int count = 0;
+        
+        for (TestResult result : studentResults.values()) {
+            if (result != null && result.getCalculatedGrade() != null) {
+                sum = sum.add(result.getCalculatedGrade());
+                count++;
+            }
+        }
+        
+        if (count == 0) {
+            return 0;
+        }
+        
+        // Calculate average
+        BigDecimal average = sum.divide(BigDecimal.valueOf(count), 2, BigDecimal.ROUND_HALF_UP);
+        
+        // Round to nearest integer using Math.round()
+        // Math.round() uses standard rounding: 0.5 and above rounds up
+        return (int) Math.round(average.doubleValue());
+    }
+    
+    /**
+     * Creates a cell with integer value (for grades).
+     * Requirements: 14.3, 14.8
+     * 
+     * @param row Excel row
+     * @param colNum Column number (0-based)
+     * @param value Integer value
+     * @return Created cell
+     */
+    private Cell createIntegerCell(Row row, int colNum, int value) {
+        Cell cell = row.createCell(colNum);
+        cell.setCellValue(value);
+        
+        // Create number format for integers (no decimal places)
+        CellStyle style = row.getSheet().getWorkbook().createCellStyle();
+        DataFormat format = row.getSheet().getWorkbook().createDataFormat();
+        style.setDataFormat(format.getFormat("0")); // Integer format
+        cell.setCellStyle(style);
+        
+        return cell;
+    }
+    
+    /**
+     * Auto-sizes columns for fixed format export (6 columns with notes).
+     * 
+     * @param sheet Excel sheet
+     */
+    private void autoSizeFixedFormatColumns(Sheet sheet) {
+        // Fixed 6 columns
+        for (int i = 0; i < 6; i++) {
             sheet.autoSizeColumn(i);
             
             // Add some padding to the auto-sized width

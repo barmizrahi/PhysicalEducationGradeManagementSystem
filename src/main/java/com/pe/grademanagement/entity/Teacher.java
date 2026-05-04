@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Teacher entity representing a PE teacher in the system.
- * This is a placeholder implementation to be completed in task 2.1.
+ * Uses Google OAuth for authentication.
  */
 @Entity
 @Table(name = "teachers")
@@ -17,16 +17,22 @@ public class Teacher {
     private Long id;
     
     @Column(unique = true, nullable = false)
-    private String username;
+    private String email;
     
-    @Column(nullable = false)
-    private String passwordHash;
+    @Column(unique = true)
+    private String googleId;
     
     @Column(nullable = false)
     private String fullName;
     
+    @Column
+    private String picture;
+    
     @Column(nullable = false, updatable = false)
     private Timestamp createdAt;
+    
+    @Column
+    private Timestamp updatedAt;
     
     @OneToMany(mappedBy = "teacher")
     private List<Class> classes;
@@ -39,6 +45,13 @@ public class Teacher {
     public Teacher() {
     }
     
+    public Teacher(String email, String googleId, String fullName, String picture) {
+        this.email = email;
+        this.googleId = googleId;
+        this.fullName = fullName;
+        this.picture = picture;
+    }
+    
     public Long getId() {
         return id;
     }
@@ -47,20 +60,20 @@ public class Teacher {
         this.id = id;
     }
     
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
     
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
     
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getGoogleId() {
+        return googleId;
     }
     
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
     }
     
     public String getFullName() {
@@ -71,12 +84,28 @@ public class Teacher {
         this.fullName = fullName;
     }
     
+    public String getPicture() {
+        return picture;
+    }
+    
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+    
     public Timestamp getCreatedAt() {
         return createdAt;
     }
     
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+    
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
     
     public List<Class> getClasses() {
@@ -98,5 +127,11 @@ public class Teacher {
     @PrePersist
     protected void onCreate() {
         createdAt = new Timestamp(System.currentTimeMillis());
+        updatedAt = new Timestamp(System.currentTimeMillis());
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Timestamp(System.currentTimeMillis());
     }
 }

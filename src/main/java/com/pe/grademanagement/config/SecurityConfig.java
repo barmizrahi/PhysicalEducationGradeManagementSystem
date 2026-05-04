@@ -10,18 +10,17 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
- * Spring Security configuration for JWT-based authentication.
+ * Spring Security configuration for JWT-based authentication with Google OAuth.
  * Configures HTTP security rules, JWT filter, and stateless session management.
  * 
  * Requirements:
- * - 13.1: Configure Spring Security with JWT authentication
+ * - Configure Spring Security with JWT authentication
+ * - Allow Google OAuth endpoints without authentication
  */
 @Configuration
 @EnableWebSecurity
@@ -57,7 +56,10 @@ public class SecurityConfig {
             
             // Configure authorization rules
             .authorizeHttpRequests(auth -> auth
-                // Allow authentication endpoints without authentication
+                // Allow Google OAuth endpoints without authentication
+                .requestMatchers("/api/auth/google/**").permitAll()
+                
+                // Allow other authentication endpoints without authentication
                 .requestMatchers("/api/auth/**").permitAll()
                 
                 // Allow health check endpoints without authentication
@@ -89,14 +91,6 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
-    }
-    
-    /**
-     * Password encoder bean for BCrypt password hashing.
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
     
     /**

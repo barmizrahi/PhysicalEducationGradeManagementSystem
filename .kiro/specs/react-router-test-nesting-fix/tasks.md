@@ -1,0 +1,125 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Router Nesting Error in Tests
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists
+  - **Scoped PBT Approach**: For deterministic bugs, scope the property to the concrete failing case(s) to ensure reproducibility
+  - Test that components using routing hooks (useNavigate) wrapped in BrowserRouter cause nesting errors
+  - Test implementation details from Bug Condition in design: `isBugCondition(input) where input.componentUsesRoutingHooks = true AND input.testWrapsInBrowserRouter = true AND input.componentOrContextAlreadyHasRouter = true`
+  - The test assertions should match the Expected Behavior Properties from design: tests should provide routing context using MemoryRouter without nesting errors
+  - Run test on UNFIXED code (current test files with BrowserRouter)
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bug exists)
+  - Document counterexamples found: specific test files showing "You cannot render a <Router> inside another <Router>" errors
+  - Examine failures in Login.test.tsx, GradeEntry.test.tsx, StudentList.test.tsx to understand root cause
+  - Mark task complete when test is written, run, and failure is documented
+  - **COMPLETED**: Bug condition confirmed - 48 tests failing with Router nesting errors
+  - _Requirements: 1.1, 1.2, 1.3_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Production Routing and Non-Routing Tests
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-buggy inputs (production code, non-routing tests)
+  - Write property-based tests capturing observed behavior patterns from Preservation Requirements:
+    - Production code in App.tsx uses BrowserRouter for browser history management
+    - Tests that don't use routing features pass without requiring routing setup
+    - Test assertions validate the same functionality
+    - Component functionality and business logic remain unchanged
+  - Property-based testing generates many test cases for stronger guarantees
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - **COMPLETED**: Preservation requirements validated - production code and non-routing tests unaffected
+  - _Requirements: 3.1, 3.2, 3.3, 3.4_
+
+- [ ] 3. Fix for React Router nesting error in test files
+
+  - [x] 3.1 Replace BrowserRouter with MemoryRouter in Login.test.tsx
+    - Import MemoryRouter instead of BrowserRouter from 'react-router-dom'
+    - Update renderLogin helper function to wrap component in MemoryRouter
+    - Change line 3: `import { BrowserRouter }` to `import { MemoryRouter }`
+    - Change lines 27-31: Replace `<BrowserRouter>` with `<MemoryRouter>` in renderLogin function
+    - Verify useNavigate mock is still properly configured
+    - _Bug_Condition: isBugCondition(input) where input.componentUsesRoutingHooks = true AND input.testWrapsInBrowserRouter = true_
+    - _Expected_Behavior: Tests provide routing context using MemoryRouter without nesting errors_
+    - _Preservation: Production BrowserRouter in App.tsx, test assertions, non-routing tests remain unchanged_
+    - _Requirements: 1.1, 1.2, 2.1, 2.2, 3.1, 3.2, 3.3, 3.4_
+
+  - [x] 3.2 Add MemoryRouter wrapper to GradeEntry.test.tsx
+    - Add MemoryRouter import from 'react-router-dom'
+    - Wrap all render(<GradeEntry />) calls with <MemoryRouter>
+    - Replace: `render(<GradeEntry />)`
+    - With: `render(<MemoryRouter><GradeEntry /></MemoryRouter>)`
+    - Apply to all test cases in the file
+    - _Bug_Condition: isBugCondition(input) where component uses routing hooks but test lacks Router context_
+    - _Expected_Behavior: Tests provide routing context using MemoryRouter without nesting errors_
+    - _Preservation: Production BrowserRouter in App.tsx, test assertions, non-routing tests remain unchanged_
+    - _Requirements: 1.1, 1.2, 2.1, 2.2, 3.1, 3.2, 3.3, 3.4_
+
+  - [x] 3.3 Add MemoryRouter wrapper to StudentList.test.tsx
+    - Add MemoryRouter import from 'react-router-dom'
+    - Wrap all render(<StudentList />) calls with <MemoryRouter>
+    - Replace: `render(<StudentList />)`
+    - With: `render(<MemoryRouter><StudentList /></MemoryRouter>)`
+    - Apply to all test cases in the file
+    - _Bug_Condition: isBugCondition(input) where component uses routing hooks but test lacks Router context_
+    - _Expected_Behavior: Tests provide routing context using MemoryRouter without nesting errors_
+    - _Preservation: Production BrowserRouter in App.tsx, test assertions, non-routing tests remain unchanged_
+    - _Requirements: 1.1, 1.2, 2.1, 2.2, 3.1, 3.2, 3.3, 3.4_
+
+  - [x] 3.4 Apply MemoryRouter pattern to other affected test files
+    - Identify any other test files with Router nesting errors (from the 48 failing tests)
+    - For each affected file:
+      - Import MemoryRouter from 'react-router-dom'
+      - Replace BrowserRouter with MemoryRouter OR add MemoryRouter wrapper if missing
+      - Ensure all components using routing hooks are wrapped in MemoryRouter
+    - Document which files were modified
+    - **COMPLETED**: Fixed 5 additional files:
+      - `frontend/src/App.test.tsx`
+      - `frontend/src/components/ExportForm.test.tsx`
+      - `frontend/src/components/TestForm.test.tsx`
+      - `frontend/src/components/TestAssignment.test.tsx`
+      - `frontend/src/components/StudentImport.test.tsx`
+    - _Bug_Condition: isBugCondition(input) where component uses routing hooks and test has Router issues_
+    - _Expected_Behavior: Tests provide routing context using MemoryRouter without nesting errors_
+    - _Preservation: Production BrowserRouter in App.tsx, test assertions, non-routing tests remain unchanged_
+    - _Requirements: 1.1, 1.2, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4_
+
+  - [x] 3.5 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Router Context Without Nesting
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - Verify no "You cannot render a <Router> inside another <Router>" errors
+    - Verify components using routing hooks render correctly
+    - **COMPLETED**: All 253 tests passing - no Router nesting errors
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+
+  - [x] 3.6 Verify preservation tests still pass
+    - **Property 2: Preservation** - Production Routing and Non-Routing Tests
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Verify App.tsx still uses BrowserRouter (production code unchanged)
+    - Verify non-routing tests still pass without routing setup
+    - Verify test assertions remain unchanged
+    - Confirm all tests still pass after fix (no regressions)
+    - **COMPLETED**: All preservation requirements validated - no regressions detected
+    - _Requirements: 3.1, 3.2, 3.3, 3.4_
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Run full test suite (all 253 tests)
+  - Verify all 48 previously failing tests now pass
+  - Verify no Router nesting errors in any test output
+  - Verify test coverage remains the same or improves
+  - Verify production build still works correctly
+  - Ask the user if questions arise
+  - **COMPLETED**: Full test suite passing
+    - Test Files: 18 passed (18)
+    - Tests: 253 passed (253)
+    - Duration: ~11.5s
+    - Zero failures, zero Router nesting errors

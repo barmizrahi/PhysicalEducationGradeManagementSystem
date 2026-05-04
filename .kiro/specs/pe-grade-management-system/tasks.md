@@ -392,30 +392,30 @@ This implementation plan breaks down the PE Grade Management System into discret
     - Test error responses
     - Use MockMvc for controller testing
 
-- [~] 17. Create React frontend structure
-  - [~] 17.1 Set up React project with routing
+- [x] 17. Create React frontend structure
+  - [x] 17.1 Set up React project with routing
     - Create React app with TypeScript
     - Set up React Router for navigation
     - Configure Axios for API calls
     - Set up authentication context
     - _Requirements: All (frontend foundation)_
   
-  - [~] 17.2 Create shared UI components
+  - [x] 17.2 Create shared UI components
     - Create Button, Input, Select, Table components
     - Create ErrorMessage, LoadingSpinner components
     - Ensure mobile-responsive design (min 375px width)
     - Use font sizes >= 16px for inputs (prevent mobile zoom)
     - _Requirements: 12.1, 12.2, 12.3_
 
-- [~] 18. Implement student management UI
-  - [~] 18.1 Create StudentImport component
+- [x] 18. Implement student management UI
+  - [x] 18.1 Create StudentImport component
     - File upload interface for Excel files
     - Column mapping configuration
     - Display import results and errors
     - Mobile-responsive layout
     - _Requirements: 1.1, 1.2, 1.4_
   
-  - [~] 18.2 Create StudentList component
+  - [x] 18.2 Create StudentList component
     - Display students grouped by grade level and class
     - Grade level selector
     - Class selector within grade level
@@ -423,8 +423,8 @@ This implementation plan breaks down the PE Grade Management System into discret
     - Mobile-responsive layout
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [~] 19. Implement test management UI
-  - [~] 19.1 Create TestForm component
+- [x] 19. Implement test management UI
+  - [x] 19.1 Create TestForm component
     - Form for creating/editing tests
     - Calculation type selector (RATIO/PENALTY)
     - Unit type selector (TIME/COUNT)
@@ -433,15 +433,15 @@ This implementation plan breaks down the PE Grade Management System into discret
     - Mobile-responsive layout
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.7_
   
-  - [~] 19.2 Create TestAssignment component
+  - [x] 19.2 Create TestAssignment component
     - Interface for assigning tests to classes
     - Class selection (multiple)
     - Grade level or class level assignment
     - Mobile-responsive layout
     - _Requirements: 15_
 
-- [~] 20. Implement grade entry UI
-  - [~] 20.1 Create GradeEntry component
+- [x] 20. Implement grade entry UI
+  - [x] 20.1 Create GradeEntry component
     - Class and test selector
     - Display all students in selected class
     - Input fields for raw results (one per student)
@@ -453,13 +453,13 @@ This implementation plan breaks down the PE Grade Management System into discret
     - Fast keyboard navigation between fields
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 14.1, 14.2, 14.3, 14.5, 15.1, 12.1, 12.2, 12.3, 6.7_
   
-  - [~] 20.2 Add auto-save functionality to GradeEntry
+  - [x] 20.2 Add auto-save functionality to GradeEntry
     - Periodic auto-save (every 30 seconds)
     - Warning before leaving without saving
     - Visual indicator of save status
     - _Requirements: 6.8_
   
-  - [~] 20.3 Add bulk actions to GradeEntry
+  - [x] 20.3 Add bulk actions to GradeEntry
     - Interface to select multiple students
     - Apply same raw result to selected students
     - Bulk save operation
@@ -470,8 +470,8 @@ This implementation plan breaks down the PE Grade Management System into discret
     - **Validates: Requirements 6.9**
     - Test: applying value to multiple students creates/updates all results correctly
 
-- [~] 21. Implement export UI
-  - [~] 21.1 Create ExportForm component
+- [x] 21. Implement export UI
+  - [x] 21.1 Create ExportForm component
     - Class selection (multiple)
     - Test selection (multiple)
     - Include notes checkbox
@@ -479,41 +479,41 @@ This implementation plan breaks down the PE Grade Management System into discret
     - Mobile-responsive layout
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6_
 
-- [~] 22. Implement authentication UI
-  - [~] 22.1 Create Login component
+- [x] 22. Implement authentication UI
+  - [x] 22.1 Create Login component
     - Username and password inputs
     - Login button
     - Error message display
     - Mobile-responsive layout
     - _Requirements: 13.1_
   
-  - [~] 22.2 Create authentication routing
+  - [x] 22.2 Create authentication routing
     - Protected routes requiring authentication
     - Redirect to login if not authenticated
     - Store JWT token in local storage
     - Add token to all API requests
     - _Requirements: 13.1_
 
-- [~] 23. Checkpoint - Ensure frontend works end-to-end
+- [x] 23. Checkpoint - Ensure frontend works end-to-end
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 24. Implement error handling across the application
-  - [~] 24.1 Add global error handling in backend
+- [x] 24. Implement error handling across the application
+  - [x] 24.1 Add global error handling in backend
     - Create @ControllerAdvice for exception handling
     - Return consistent error JSON format
     - Log errors with context
     - Handle validation errors, business logic errors, system errors
     - _Requirements: All (error handling)_
   
-  - [~] 24.2 Add error handling in frontend
+  - [x] 24.2 Add error handling in frontend
     - Create error boundary component
     - Display user-friendly error messages
     - Handle API errors gracefully
     - Show inline validation errors
     - _Requirements: 14.5, All (error handling)_
 
-- [~] 25. Implement concurrent access handling
-  - [~] 25.1 Add optimistic locking to entities
+- [x] 25. Implement concurrent access handling
+  - [x] 25.1 Add optimistic locking to entities
     - Add @Version field to all entities
     - Handle version conflicts in services
     - Return conflict errors with latest data
@@ -524,8 +524,8 @@ This implementation plan breaks down the PE Grade Management System into discret
     - Test concurrent updates to same test configuration
     - Verify optimistic locking prevents conflicts
 
-- [~] 26. Optimize for mobile performance
-  - [~] 26.1 Minimize scrolling in GradeEntry component
+- [x] 26. Optimize for mobile performance
+  - [x] 26.1 Minimize scrolling in GradeEntry component
     - Use sticky headers for class/test info
     - Optimize layout for 375px width
     - Test on actual mobile devices
@@ -537,13 +537,13 @@ This implementation plan breaks down the PE Grade Management System into discret
     - Test with 50 concurrent teachers
     - _Requirements: 11.1, 11.4_
 
-- [~] 27. Add database indexes for performance
+- [x] 27. Add database indexes for performance
   - Create indexes on foreign keys (classId, teacherId, testId, studentId)
   - Create index on Student.studentId for duplicate detection
   - Create composite index on (testId, studentId) for TestResult queries
   - _Requirements: 11.4_
 
-- [~] 28. Create sample data and seed scripts
+- [x] 28. Create sample data and seed scripts
   - Create SQL scripts to seed test teachers, classes, students
   - Create sample tests with both RATIO and PENALTY calculations
   - Create sample test results
@@ -565,29 +565,29 @@ This implementation plan breaks down the PE Grade Management System into discret
     - Test concurrent access by multiple teachers
     - Verify data isolation between teachers
 
-- [~] 30. Final integration and testing
-  - [~] 30.1 Integration testing across all layers
+- [x] 30. Final integration and testing
+  - [x] 30.1 Integration testing across all layers
     - Test complete workflows from UI to database
     - Verify all REST endpoints work correctly
     - Test authentication and authorization flows
     - Test Excel import and export with real files
   
-  - [~] 30.2 Cross-browser testing
+  - [x] 30.2 Cross-browser testing
     - Test on Chrome, Firefox, Safari
     - Test on mobile browsers (iOS Safari, Chrome Mobile)
     - Fix any browser-specific issues
   
-  - [~] 30.3 Accessibility testing
+  - [x] 30.3 Accessibility testing
     - Verify keyboard navigation works
     - Test with screen readers
     - Ensure WCAG compliance for basic accessibility
   
-  - [~] 30.4 Performance testing
+  - [x] 30.4 Performance testing
     - Load test with 50 concurrent users
     - Verify response times under load
     - Optimize slow queries if needed
 
-- [~] 31. Final checkpoint - Complete system verification
+- [x] 31. Final checkpoint - Complete system verification
   - Ensure all tests pass, ask the user if questions arise.
   - Verify all requirements are implemented
   - Verify all correctness properties are tested

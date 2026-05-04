@@ -64,10 +64,10 @@ public class StudentService {
             throw new AccessDeniedException("No authenticated user found");
         }
         
-        String username = authentication.getName();
+        String email = authentication.getName();
         
-        return teacherRepository.findByUsername(username)
-            .orElseThrow(() -> new AccessDeniedException("Teacher not found for username: " + username));
+        return teacherRepository.findByEmail(email)
+            .orElseThrow(() -> new AccessDeniedException("Teacher not found for email: " + email));
     }
     
     /**
