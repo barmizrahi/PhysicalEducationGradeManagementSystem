@@ -15,6 +15,7 @@ interface AuthContextType {
   googleLogin: (authorizationCode: string) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
+  isLoading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -34,6 +35,7 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Load token from localStorage on mount
@@ -54,6 +56,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.removeItem('user')
       }
     }
+    
+    setIsLoading(false)
   }, [])
 
   const googleLogin = async (authorizationCode: string) => {
@@ -107,6 +111,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     googleLogin,
     logout,
     isAuthenticated: !!token && !!user,
+    isLoading,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
