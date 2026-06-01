@@ -29,6 +29,7 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
   const [error, setError] = useState<string>('');
   const [deleteStudentConfirm, setDeleteStudentConfirm] = useState<number | null>(null);
   const [deleteClassConfirm, setDeleteClassConfirm] = useState<boolean>(false);
+  const [deleteGradeLevelConfirm, setDeleteGradeLevelConfirm] = useState<boolean>(false);
   const [deleting, setDeleting] = useState<boolean>(false);
 
   // Fetch students on component mount
@@ -115,6 +116,38 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
       await fetchStudents();
     } catch (err: any) {
       setError(err.response?.data?.message || 'שגיאה במחיקת כיתה');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteGradeLevel = async () => {
+    if (!selectedGradeLevel || !studentsData[selectedGradeLevel]) return;
+    
+    try {
+      setDeleting(true);
+      setError('');
+      
+      // Get all classes in this grade level
+      const classesInGrade = studentsData[selectedGradeLevel];
+      const classIds = new Set<number>();
+      
+      // Collect all unique class IDs
+      Object.values(classesInGrade).forEach((students: Student[]) => {
+        if (students.length > 0) {
+          classIds.add(students[0].classId);
+        }
+      });
+      
+      // Delete each class
+      for (const classId of classIds) {
+        await studentsApi.deleteClass(classId);
+      }
+      
+      setDeleteGradeLevelConfirm(false);
+      await fetchStudents();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'שגיאה במחיקת שכבה');
     } finally {
       setDeleting(false);
     }
@@ -258,6 +291,37 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
           />
         </div>
       </div>
+
+      {/* Delete Grade Level Button */}
+      {selectedGradeLevel && classesForSelectedGrade.length > 0 && (
+        <div className="mb-3 flex justify-end">
+          {deleteGradeLevelConfirm ? (
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteGradeLevel}
+                disabled={deleting}
+                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+              >
+                ✓ אישור מחיקת שכבה {selectedGradeLevel}
+              </button>
+              <button
+                onClick={() => setDeleteGradeLevelConfirm(false)}
+                disabled={deleting}
+                className="px-4 py-2 text-sm font-medium bg-gray-500 text-white rounded-md hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+              >
+                ✕ ביטול
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setDeleteGradeLevelConfirm(true)}
+              className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm"
+            >
+              🗑️ מחק שכבה {selectedGradeLevel} שלמה
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Student Count */}
       {selectedGradeLevel && selectedClass && (

@@ -14,18 +14,18 @@ export const StudentListPage: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-text-primary">
-                Student List
+                רשימת תלמידים
               </h1>
               <p className="text-sm text-text-secondary mt-1">
-                View and manage your students
+                צפייה וניהול תלמידים
               </p>
             </div>
             <div className="flex gap-2">
               <Button variant="primary" onClick={() => navigate('/students/import')}>
-                Import Students
+                ייבוא תלמידים
               </Button>
               <Button variant="secondary" onClick={() => navigate('/dashboard')}>
-                Back to Dashboard
+                חזרה ללוח הבקרה
               </Button>
             </div>
           </div>

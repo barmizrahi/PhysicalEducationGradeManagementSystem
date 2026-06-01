@@ -14,14 +14,14 @@ export const GradeEntryPage: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-text-primary">
-                Grade Entry
+                הזנת ציונים
               </h1>
               <p className="text-sm text-text-secondary mt-1">
-                Enter and manage student grades
+                הזנה וניהול ציוני תלמידים
               </p>
             </div>
             <Button variant="secondary" onClick={() => navigate('/dashboard')}>
-              Back to Dashboard
+              חזרה ללוח הבקרה
             </Button>
           </div>
         </div>

@@ -34,7 +34,7 @@ export const StudentImportPage: React.FC = () => {
               </p>
             </div>
             <Button variant="secondary" onClick={() => navigate('/dashboard')}>
-              {t('common.backToDashboard')}
+              חזרה ללוח הבקרה
             </Button>
           </div>
         </div>
