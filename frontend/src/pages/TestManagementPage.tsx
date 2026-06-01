@@ -142,7 +142,7 @@ export const TestManagementPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm">
             {loadingTests ? (
               <div className="p-8 flex justify-center">
-                <LoadingSpinner size="large" />
+                <LoadingSpinner size="md" />
               </div>
             ) : tests.length === 0 ? (
               <div className="p-8 text-center text-text-secondary">
@@ -257,3 +257,4 @@ export const TestManagementPage: React.FC = () => {
     </div>
   )
 }
+

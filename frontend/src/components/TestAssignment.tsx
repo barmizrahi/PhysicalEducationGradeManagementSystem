@@ -57,7 +57,6 @@ export const TestAssignment: React.FC<TestAssignmentProps> = ({
   const [assignmentMode, setAssignmentMode] = useState<'grade' | 'class'>('grade');
   const [selectedGradeLevel, setSelectedGradeLevel] = useState<string>('');
   const [selectedClassIds, setSelectedClassIds] = useState<number[]>([]);
-  const [availableClasses, setAvailableClasses] = useState<Class[]>([]);
   const [classesByGrade, setClassesByGrade] = useState<Record<string, Class[]>>({});
 
   // Fetch classes on mount
@@ -99,7 +98,6 @@ export const TestAssignment: React.FC<TestAssignmentProps> = ({
         });
       });
       
-      setAvailableClasses(Array.from(classesMap.values()));
       setClassesByGrade(gradeMap);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || t('errors.loadClasses');
@@ -379,3 +377,4 @@ export const TestAssignment: React.FC<TestAssignmentProps> = ({
     </div>
   );
 };
+

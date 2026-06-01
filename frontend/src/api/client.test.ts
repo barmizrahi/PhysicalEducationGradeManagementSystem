@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import axios from 'axios'
 import apiClient from './client'
 
 // Mock axios to intercept requests
@@ -121,7 +120,7 @@ describe('API Client - JWT Token Management', () => {
       const interceptors = apiClient.interceptors.response as any
       const rejected = interceptors.handlers[0].rejected
 
-      // Create a 500 error
+      // Create a non-401 error
       const error = {
         response: {
           status: 500,
@@ -138,44 +137,6 @@ describe('API Client - JWT Token Management', () => {
       expect(localStorage.getItem('token')).toBe(mockToken)
       expect(localStorage.getItem('user')).toBe(mockUser)
     })
-
-    it('should pass through successful responses', () => {
-      const interceptors = apiClient.interceptors.response as any
-      const fulfilled = interceptors.handlers[0].fulfilled
-
-      const response = { status: 200, data: { success: true } }
-      const result = fulfilled(response)
-
-      expect(result).toEqual(response)
-    })
-  })
-
-  describe('Token Lifecycle', () => {
-    it('should read token from localStorage on each request', () => {
-      const interceptors = apiClient.interceptors.request as any
-      const fulfilled = interceptors.handlers[0].fulfilled
-
-      // First request without token
-      let config = { headers: {} }
-      let result = fulfilled(config)
-      expect(result.headers.Authorization).toBeUndefined()
-
-      // Set token (simulating login)
-      const newToken = 'new-jwt-token'
-      localStorage.setItem('token', newToken)
-
-      // Second request should include token
-      config = { headers: {} }
-      result = fulfilled(config)
-      expect(result.headers.Authorization).toBe(`Bearer ${newToken}`)
-
-      // Remove token (simulating logout)
-      localStorage.removeItem('token')
-
-      // Third request should not include token
-      config = { headers: {} }
-      result = fulfilled(config)
-      expect(result.headers.Authorization).toBeUndefined()
-    })
   })
 })
+

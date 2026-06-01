@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Student } from '../types';
 import { studentsApi } from '../api/students';
-import { Select, Table, LoadingSpinner, ErrorMessage, Button } from './ui';
+import { Select, Table, LoadingSpinner, ErrorMessage } from './ui';
 import type { TableColumn } from './ui';
 
 interface StudentListProps {
@@ -146,7 +146,7 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
       header: t('students.className'),
       align: 'center',
       width: '15%',
-      render: (student) => selectedClass,
+      render: () => selectedClass,
     },
     {
       key: 'actions',
@@ -189,7 +189,7 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
   if (loading) {
     return (
       <div className={`p-4 ${className}`}>
-        <LoadingSpinner size="large" />
+        <LoadingSpinner size="md" />
       </div>
     );
   }
@@ -327,3 +327,4 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
     </div>
   );
 };
+
