@@ -106,25 +106,25 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Info Section */}
-        <div className="mt-12 bg-white rounded-lg shadow-sm p-6">
+        <div className="mt-12 bg-white rounded-lg shadow-sm p-6" dir="rtl">
           <h3 className="text-lg font-semibold text-text-primary mb-4">
             מדריך התחלה מהירה
           </h3>
           <ol className="space-y-3 text-text-secondary">
-            <li className="flex items-start">
-              <span className="font-semibold text-primary-color mr-2">1.</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold text-primary-color ml-2">1.</span>
               <span>ייבא את התלמידים שלך מקובץ Excel</span>
             </li>
-            <li className="flex items-start">
-              <span className="font-semibold text-primary-color mr-2">2.</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold text-primary-color ml-2">2.</span>
               <span>צור מבחנים והגדר שיטות חישוב</span>
             </li>
-            <li className="flex items-start">
-              <span className="font-semibold text-primary-color mr-2">3.</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold text-primary-color ml-2">3.</span>
               <span>הזן ציונים עבור התלמידים שלך</span>
             </li>
-            <li className="flex items-start">
-              <span className="font-semibold text-primary-color mr-2">4.</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold text-primary-color ml-2">4.</span>
               <span>ייצא תוצאות ל-Excel עבור משרד החינוך</span>
             </li>
           </ol>

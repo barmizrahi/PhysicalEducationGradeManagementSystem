@@ -255,7 +255,7 @@ export const ExportForm: React.FC<ExportFormProps> = ({
         </div>
 
         {/* Export Format Description in Hebrew */}
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-md" dir="rtl">
           <h3 className="text-base font-semibold text-text-primary mb-3">
             {t('export.exportFormat')}
           </h3>
@@ -263,23 +263,23 @@ export const ExportForm: React.FC<ExportFormProps> = ({
             {t('export.formatDescription')}
           </p>
           <ul className="text-sm text-text-secondary space-y-2">
-            <li className="flex items-start">
-              <span className="font-semibold ml-2 min-w-[80px]">{t('export.exportColumn1')}</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold mr-2 min-w-[80px]">{t('export.exportColumn1')}</span>
             </li>
-            <li className="flex items-start">
-              <span className="font-semibold ml-2 min-w-[80px]">{t('export.exportColumn2')}</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold mr-2 min-w-[80px]">{t('export.exportColumn2')}</span>
             </li>
-            <li className="flex items-start">
-              <span className="font-semibold ml-2 min-w-[80px]">{t('export.exportColumn3')}</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold mr-2 min-w-[80px]">{t('export.exportColumn3')}</span>
             </li>
-            <li className="flex items-start">
-              <span className="font-semibold ml-2 min-w-[80px]">{t('export.exportColumn4')}</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold mr-2 min-w-[80px]">{t('export.exportColumn4')}</span>
             </li>
-            <li className="flex items-start">
-              <span className="font-semibold ml-2 min-w-[80px]">{t('export.exportColumn5')}</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold mr-2 min-w-[80px]">{t('export.exportColumn5')}</span>
             </li>
-            <li className="flex items-start">
-              <span className="font-semibold ml-2 min-w-[80px]">{t('export.exportColumn6')}</span>
+            <li className="flex items-start" dir="rtl">
+              <span className="font-semibold mr-2 min-w-[80px]">{t('export.exportColumn6')}</span>
             </li>
           </ul>
           <p className="text-sm text-blue-700 font-medium mt-3">
