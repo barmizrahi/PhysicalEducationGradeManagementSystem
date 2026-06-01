@@ -187,7 +187,7 @@ export const ExportForm: React.FC<ExportFormProps> = ({
   if (loadingClasses) {
     return (
       <div className={`bg-white rounded-lg shadow-md p-4 md:p-6 ${className}`}>
-        <LoadingSpinner size="large" />
+        <LoadingSpinner size="md" />
       </div>
     );
   }
@@ -313,3 +313,4 @@ export const ExportForm: React.FC<ExportFormProps> = ({
     </div>
   );
 };
+

@@ -53,7 +53,7 @@ export const TestAssignmentPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-bg-secondary flex items-center justify-center">
-        <LoadingSpinner size="large" />
+        <LoadingSpinner size="md" />
       </div>
     )
   }
@@ -113,3 +113,4 @@ export const TestAssignmentPage: React.FC = () => {
     </div>
   )
 }
+
