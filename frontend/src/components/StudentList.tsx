@@ -193,14 +193,16 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
               <button
                 onClick={() => handleDeleteStudent(student.id)}
                 disabled={deleting}
-                className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                style={{ backgroundColor: '#dc2626', color: 'white' }}
+                className="px-3 py-1.5 text-xs font-bold rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
               >
                 ✓ אישור מחיקה
               </button>
               <button
                 onClick={() => setDeleteStudentConfirm(null)}
                 disabled={deleting}
-                className="px-3 py-1.5 text-xs font-medium bg-gray-500 text-white rounded-md hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                style={{ backgroundColor: '#6b7280', color: 'white' }}
+                className="px-3 py-1.5 text-xs font-bold rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
               >
                 ✕ ביטול
               </button>
@@ -208,7 +210,8 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
           ) : (
             <button
               onClick={() => setDeleteStudentConfirm(student.id)}
-              className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm"
+              style={{ backgroundColor: '#dc2626', color: 'white' }}
+              className="px-3 py-1.5 text-xs font-bold rounded-md hover:opacity-90 transition-all shadow-md"
             >
               🗑️ מחק
             </button>
@@ -300,14 +303,16 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
               <button
                 onClick={handleDeleteGradeLevel}
                 disabled={deleting}
-                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                style={{ backgroundColor: '#dc2626', color: 'white' }}
+                className="px-4 py-2 text-sm font-bold rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
               >
                 ✓ אישור מחיקת שכבה {selectedGradeLevel}
               </button>
               <button
                 onClick={() => setDeleteGradeLevelConfirm(false)}
                 disabled={deleting}
-                className="px-4 py-2 text-sm font-medium bg-gray-500 text-white rounded-md hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                style={{ backgroundColor: '#6b7280', color: 'white' }}
+                className="px-4 py-2 text-sm font-bold rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
               >
                 ✕ ביטול
               </button>
@@ -315,7 +320,8 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
           ) : (
             <button
               onClick={() => setDeleteGradeLevelConfirm(true)}
-              className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm"
+              style={{ backgroundColor: '#dc2626', color: 'white' }}
+              className="px-4 py-2 text-sm font-bold rounded-md hover:opacity-90 transition-all shadow-md"
             >
               🗑️ מחק שכבה {selectedGradeLevel} שלמה
             </button>
@@ -336,14 +342,16 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
                   <button
                     onClick={handleDeleteClass}
                     disabled={deleting}
-                    className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                    style={{ backgroundColor: '#dc2626', color: 'white' }}
+                    className="px-4 py-2 text-sm font-bold rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
                   >
                     ✓ אישור מחיקת כיתה
                   </button>
                   <button
                     onClick={() => setDeleteClassConfirm(false)}
                     disabled={deleting}
-                    className="px-4 py-2 text-sm font-medium bg-gray-500 text-white rounded-md hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                    style={{ backgroundColor: '#6b7280', color: 'white' }}
+                    className="px-4 py-2 text-sm font-bold rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
                   >
                     ✕ ביטול
                   </button>
@@ -351,7 +359,8 @@ export const StudentList: React.FC<StudentListProps> = ({ className = '' }) => {
               ) : (
                 <button
                   onClick={() => setDeleteClassConfirm(true)}
-                  className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm"
+                  style={{ backgroundColor: '#dc2626', color: 'white' }}
+                  className="px-4 py-2 text-sm font-bold rounded-md hover:opacity-90 transition-all shadow-md"
                 >
                   🗑️ מחק כיתה שלמה
                 </button>
