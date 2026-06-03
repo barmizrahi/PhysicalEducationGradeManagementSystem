@@ -24,6 +24,11 @@ export const formatTimeFromDecimal = (decimalMinutes: number): string => {
  * Example: "10:30" → 10.5
  */
 export const parseTimeToDecimal = (timeString: string): number | null => {
+  const trimmed = timeString.trim()
+
+  if (trimmed === "0") {
+    return 0
+  }
   const match = timeString.match(/^(\d+):(\d{2})$/)
   if (!match) {
     return null
