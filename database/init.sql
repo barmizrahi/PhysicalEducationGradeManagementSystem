@@ -27,7 +27,7 @@ Expected tables:
 - teacher (id, username, password_hash, full_name, created_at)
 - class (id, name, grade_level, teacher_id, created_at)
 - student (id, name, student_id, grade_level, class_id, created_at, updated_at)
-- test (id, name, calculation_type, unit_type, max_value, target_value, penalty_per_unit, created_by, created_at, updated_at)
+- test (id, name, calculation_type, unit_type, max_value, target_value, penalty_per_unit, penalty_unit, created_by, created_at, updated_at)
 - test_assignment (id, test_id, class_id, assigned_at)
 - test_result (id, student_id, test_id, raw_result, calculated_grade, notes, created_at, updated_at)
 */

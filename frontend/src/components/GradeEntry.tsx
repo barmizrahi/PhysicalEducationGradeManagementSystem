@@ -219,6 +219,10 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
 
   // Calculate grade based on test configuration
   const calculateGrade = useCallback((rawResult: number, test: Test): number => {
+    // A raw result of 0 (e.g. "0" or "00:00") means the test was not performed -> grade 0.
+    // Mirrors the backend GradeCalculator so the live preview matches the saved grade.
+    if (rawResult === 0) return 0;
+
     if (test.calculationType === 'RATIO') {
       if (!test.maxValue) return 0;
       const grade = (rawResult / test.maxValue) * 100;
@@ -226,7 +230,10 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
     } else if (test.calculationType === 'PENALTY') {
       if (!test.targetValue || !test.penaltyPerUnit) return 0;
       const deviation = rawResult - test.targetValue;
-      const grade = 100 - (deviation * test.penaltyPerUnit);
+      // penaltyUnit is the deduction interval (decimal minutes for TIME tests);
+      // defaults to 1 so COUNT tests keep the classic per-unit penalty.
+      const penaltyUnit = test.penaltyUnit && test.penaltyUnit > 0 ? test.penaltyUnit : 1;
+      const grade = 100 - (deviation / penaltyUnit) * test.penaltyPerUnit;
       return Math.max(0, Math.min(100, Math.round(grade * 100) / 100));
     }
     return 0;

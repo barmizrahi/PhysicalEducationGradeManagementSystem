@@ -25,6 +25,7 @@ public class TestRequest {
     private BigDecimal maxValue;
     private BigDecimal targetValue;
     private BigDecimal penaltyPerUnit;
+    private BigDecimal penaltyUnit;
     
     // Constructors
     
@@ -85,5 +86,13 @@ public class TestRequest {
     
     public void setPenaltyPerUnit(BigDecimal penaltyPerUnit) {
         this.penaltyPerUnit = penaltyPerUnit;
+    }
+
+    public BigDecimal getPenaltyUnit() {
+        return penaltyUnit;
+    }
+
+    public void setPenaltyUnit(BigDecimal penaltyUnit) {
+        this.penaltyUnit = penaltyUnit;
     }
 }

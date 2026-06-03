@@ -4,6 +4,7 @@ import com.pe.grademanagement.entity.CalculationType;
 import com.pe.grademanagement.entity.Class;
 import com.pe.grademanagement.entity.Test;
 import com.pe.grademanagement.entity.TestAssignment;
+import com.pe.grademanagement.entity.UnitType;
 import com.pe.grademanagement.repository.ClassRepository;
 import com.pe.grademanagement.repository.TestAssignmentRepository;
 import com.pe.grademanagement.repository.TestRepository;
@@ -83,6 +84,7 @@ public class TestService {
         existingTest.setMaxValue(updatedTest.getMaxValue());
         existingTest.setTargetValue(updatedTest.getTargetValue());
         existingTest.setPenaltyPerUnit(updatedTest.getPenaltyPerUnit());
+        existingTest.setPenaltyUnit(updatedTest.getPenaltyUnit());
         
         // Validate updated configuration
         validateTestConfiguration(existingTest);
@@ -283,6 +285,16 @@ public class TestService {
             }
             if (test.getPenaltyPerUnit().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("penaltyPerUnit must be greater than zero");
+            }
+
+            // For TIME unit type, penaltyUnit defines the deduction interval (e.g. 0.75 = every 45s).
+            // Default to 1.0 (one minute) when missing for backward compatibility.
+            if (test.getUnitType() == UnitType.TIME) {
+                if (test.getPenaltyUnit() == null) {
+                    test.setPenaltyUnit(BigDecimal.ONE);
+                } else if (test.getPenaltyUnit().compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new IllegalArgumentException("penaltyUnit must be greater than zero");
+                }
             }
         }
     }

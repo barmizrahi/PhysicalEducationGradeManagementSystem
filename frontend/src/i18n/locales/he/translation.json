@@ -207,6 +207,8 @@
     "penaltyPerUnit": "ניכוי נקודות לכל יחידה מעל היעד",
     "penaltyPerUnitHelper": "כמה נקודות מורידים לכל יחידה מעל היעד. דוגמה: 5 נקודות לכל דקה מעל 10 דקות",
     "penaltyPerUnitPlaceholder": "לדוגמה: 5 (עבור 5 נקודות לכל דקה)",
+    "penaltyUnit": "יחידת ניכוי (זמן)",
+    "penaltyUnitHelper": "כל כמה זמן מורידים את הניכוי, בפורמט mm:ss. דוגמה: 00:45 — כל 45 שניות מעל היעד מורידים את ניכוי הנקודות",
     "createTest": "צור מבחן",
     "updateTest": "עדכן מבחן",
     "formError": "שגיאת טופס",
@@ -218,7 +220,9 @@
     "targetValueRequired": "זמן יעד נדרש עבור חישוב קנס",
     "targetValueNonNegative": "זמן יעד חייב להיות מספר לא שלילי",
     "penaltyPerUnitRequired": "ניכוי נקודות נדרש עבור חישוב קנס",
-    "penaltyPerUnitPositive": "ניכוי נקודות חייב להיות מספר חיובי"
+    "penaltyPerUnitPositive": "ניכוי נקודות חייב להיות מספר חיובי",
+    "penaltyUnitRequired": "יחידת ניכוי נדרשת עבור מבחן זמן",
+    "penaltyUnitPositive": "יחידת ניכוי חייבת להיות גדולה מאפס"
   },
   
   "export": {

@@ -75,6 +75,17 @@ public class Test {
     private BigDecimal penaltyPerUnit;
     
     /**
+     * Penalty unit for PENALTY calculation with TIME unit type.
+     * Defines the time interval for penalty application.
+     * Required when calculationType = PENALTY and unitType = TIME.
+     * Null when calculationType = RATIO or unitType = COUNT.
+     * Example: 0.75 (45 seconds) means penalty applies every 45 seconds
+     * Default: 1.0 (1 minute) for backward compatibility
+     */
+    @Column(nullable = true, precision = 10, scale = 4)
+    private BigDecimal penaltyUnit;
+    
+    /**
      * Teacher who created this test configuration.
      */
     @ManyToOne(fetch = FetchType.LAZY)
@@ -193,6 +204,14 @@ public class Test {
         this.penaltyPerUnit = penaltyPerUnit;
     }
     
+    public BigDecimal getPenaltyUnit() {
+        return penaltyUnit;
+    }
+    
+    public void setPenaltyUnit(BigDecimal penaltyUnit) {
+        this.penaltyUnit = penaltyUnit;
+    }
+    
     public Teacher getCreatedBy() {
         return createdBy;
     }
@@ -254,8 +273,15 @@ public class Test {
         
         // Validate PENALTY configuration
         if (calculationType == CalculationType.PENALTY) {
-            return targetValue != null && targetValue.compareTo(BigDecimal.ZERO) > 0
+            boolean basicValid = targetValue != null && targetValue.compareTo(BigDecimal.ZERO) > 0
                     && penaltyPerUnit != null && penaltyPerUnit.compareTo(BigDecimal.ZERO) > 0;
+            
+            // For TIME unit type, penaltyUnit is required (default to 1.0 if missing for backward compatibility)
+            if (unitType == UnitType.TIME && penaltyUnit == null) {
+                penaltyUnit = BigDecimal.ONE;
+            }
+            
+            return basicValid;
         }
         
         return false;

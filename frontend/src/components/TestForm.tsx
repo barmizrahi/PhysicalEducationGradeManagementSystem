@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Test, CalculationType, UnitType } from '../types';
 import { Button, Input, Select, ErrorMessage } from './ui';
-import { parseTimeToDecimal, isValidTimeFormat } from '../utils/helpers';
+import { parseTimeToDecimal, isValidTimeFormat, formatTimeFromDecimal } from '../utils/helpers';
 
 export interface TestFormProps {
   /**
@@ -38,6 +38,7 @@ interface FormErrors {
   maxValue?: string;
   targetValue?: string;
   penaltyPerUnit?: string;
+  penaltyUnit?: string;
 }
 
 /**
@@ -76,6 +77,9 @@ export const TestForm: React.FC<TestFormProps> = ({
   const [penaltyPerUnit, setPenaltyPerUnit] = useState(
     initialTest?.penaltyPerUnit?.toString() || ''
   );
+  const [penaltyUnit, setPenaltyUnit] = useState(
+    initialTest?.penaltyUnit != null ? formatTimeFromDecimal(initialTest.penaltyUnit) : ''
+  );
   const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   // Reset conditional fields when calculation type changes
@@ -83,8 +87,9 @@ export const TestForm: React.FC<TestFormProps> = ({
     if (calculationType === 'RATIO') {
       setTargetValue('');
       setPenaltyPerUnit('');
+      setPenaltyUnit('');
       setFormErrors((prev) => {
-        const { targetValue, penaltyPerUnit, ...rest } = prev;
+        const { targetValue, penaltyPerUnit, penaltyUnit, ...rest } = prev;
         return rest;
       });
     } else {
@@ -95,6 +100,17 @@ export const TestForm: React.FC<TestFormProps> = ({
       });
     }
   }, [calculationType]);
+
+  // penaltyUnit only applies to TIME tests - clear it (and its error) for COUNT
+  useEffect(() => {
+    if (unitType !== 'TIME') {
+      setPenaltyUnit('');
+      setFormErrors((prev) => {
+        const { penaltyUnit, ...rest } = prev;
+        return rest;
+      });
+    }
+  }, [unitType]);
 
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
@@ -158,6 +174,20 @@ export const TestForm: React.FC<TestFormProps> = ({
           errors.penaltyPerUnit = t('testForm.penaltyPerUnitPositive');
         }
       }
+
+      // Penalty unit (deduction interval) - only for TIME tests, entered as mm:ss
+      if (unitType === 'TIME') {
+        if (!penaltyUnit.trim()) {
+          errors.penaltyUnit = t('testForm.penaltyUnitRequired');
+        } else if (!isValidTimeFormat(penaltyUnit)) {
+          errors.penaltyUnit = 'פורמט לא תקין. השתמש ב-mm:ss (לדוגמה: 00:45)';
+        } else {
+          const penaltyUnitNum = parseTimeToDecimal(penaltyUnit);
+          if (penaltyUnitNum === null || penaltyUnitNum <= 0) {
+            errors.penaltyUnit = t('testForm.penaltyUnitPositive');
+          }
+        }
+      }
     }
 
     setFormErrors(errors);
@@ -180,6 +210,9 @@ export const TestForm: React.FC<TestFormProps> = ({
         ? (unitType === 'TIME' ? parseTimeToDecimal(targetValue) : parseFloat(targetValue))
         : null,
       penaltyPerUnit: calculationType === 'PENALTY' ? parseFloat(penaltyPerUnit) : null,
+      penaltyUnit: calculationType === 'PENALTY' && unitType === 'TIME'
+        ? parseTimeToDecimal(penaltyUnit)
+        : null,
     };
 
     await onSubmit(testData);
@@ -285,6 +318,23 @@ export const TestForm: React.FC<TestFormProps> = ({
             required
             disabled={loading}
           />
+
+          {/* Penalty unit (deduction interval) - only for TIME tests */}
+          {unitType === 'TIME' && (
+            <Input
+              label={t('testForm.penaltyUnit')}
+              type="text"
+              inputMode="text"
+              value={penaltyUnit}
+              onChange={(e) => setPenaltyUnit(e.target.value)}
+              error={formErrors.penaltyUnit}
+              helperText={t('testForm.penaltyUnitHelper')}
+              placeholder="00:45"
+              fullWidth
+              required
+              disabled={loading}
+            />
+          )}
         </>
       )}
 

@@ -63,6 +63,7 @@ public class TestController {
             test.setMaxValue(testRequest.getMaxValue());
             test.setTargetValue(testRequest.getTargetValue());
             test.setPenaltyPerUnit(testRequest.getPenaltyPerUnit());
+            test.setPenaltyUnit(testRequest.getPenaltyUnit());
             
             // Save test
             Test createdTest = testService.createTest(test);
@@ -76,6 +77,7 @@ public class TestController {
             dto.put("maxValue", createdTest.getMaxValue());
             dto.put("targetValue", createdTest.getTargetValue());
             dto.put("penaltyPerUnit", createdTest.getPenaltyPerUnit());
+            dto.put("penaltyUnit", createdTest.getPenaltyUnit());
             dto.put("createdBy", createdTest.getCreatedBy().getId());
             dto.put("createdAt", createdTest.getCreatedAt() != null ? createdTest.getCreatedAt().toString() : null);
             dto.put("updatedAt", createdTest.getUpdatedAt() != null ? createdTest.getUpdatedAt().toString() : null);
@@ -129,6 +131,7 @@ public class TestController {
             updatedTest.setMaxValue(testRequest.getMaxValue());
             updatedTest.setTargetValue(testRequest.getTargetValue());
             updatedTest.setPenaltyPerUnit(testRequest.getPenaltyPerUnit());
+            updatedTest.setPenaltyUnit(testRequest.getPenaltyUnit());
             
             // Update test
             Test result = testService.updateTest(id, updatedTest);
@@ -142,6 +145,7 @@ public class TestController {
             dto.put("maxValue", result.getMaxValue());
             dto.put("targetValue", result.getTargetValue());
             dto.put("penaltyPerUnit", result.getPenaltyPerUnit());
+            dto.put("penaltyUnit", result.getPenaltyUnit());
             dto.put("createdBy", result.getCreatedBy().getId());
             dto.put("createdAt", result.getCreatedAt() != null ? result.getCreatedAt().toString() : null);
             dto.put("updatedAt", result.getUpdatedAt() != null ? result.getUpdatedAt().toString() : null);
@@ -232,6 +236,7 @@ public class TestController {
                     dto.put("maxValue", test.getMaxValue());
                     dto.put("targetValue", test.getTargetValue());
                     dto.put("penaltyPerUnit", test.getPenaltyPerUnit());
+                    dto.put("penaltyUnit", test.getPenaltyUnit());
                     dto.put("createdBy", test.getCreatedBy().getId());
                     dto.put("createdAt", test.getCreatedAt() != null ? test.getCreatedAt().toString() : null);
                     dto.put("updatedAt", test.getUpdatedAt() != null ? test.getUpdatedAt().toString() : null);
@@ -276,6 +281,7 @@ public class TestController {
                     dto.put("maxValue", test.getMaxValue());
                     dto.put("targetValue", test.getTargetValue());
                     dto.put("penaltyPerUnit", test.getPenaltyPerUnit());
+                    dto.put("penaltyUnit", test.getPenaltyUnit());
                     dto.put("createdBy", test.getCreatedBy().getId());
                     dto.put("createdAt", test.getCreatedAt() != null ? test.getCreatedAt().toString() : null);
                     dto.put("updatedAt", test.getUpdatedAt() != null ? test.getUpdatedAt().toString() : null);

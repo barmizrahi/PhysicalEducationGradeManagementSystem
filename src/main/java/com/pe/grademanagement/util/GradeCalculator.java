@@ -17,7 +17,7 @@ import java.math.RoundingMode;
  * - 4.3: Cap RATIO grades at 100
  * - 4.4: Return 0 for zero raw results
  * - 4.5: Round to 2 decimal places
- * - 5.1: PENALTY calculation: grade = 100 - ((rawResult - targetValue) * penaltyPerUnit)
+ * - 5.1: PENALTY calculation: grade = 100 - ((rawResult - targetValue) / penaltyUnit) * penaltyPerUnit
  * - 5.2: Support non-integer raw results
  * - 5.3: Cap PENALTY grades at 100 (no bonus)
  * - 5.4: Cap PENALTY grades at 0 (no negative)
@@ -60,7 +60,7 @@ public class GradeCalculator {
         if (test.getCalculationType() == CalculationType.RATIO) {
             return calculateRatioGrade(rawResult, test.getMaxValue());
         } else if (test.getCalculationType() == CalculationType.PENALTY) {
-            return calculatePenaltyGrade(rawResult, test.getTargetValue(), test.getPenaltyPerUnit());
+            return calculatePenaltyGrade(rawResult, test.getTargetValue(), test.getPenaltyPerUnit(), test.getPenaltyUnit());
         } else {
             throw new IllegalArgumentException("Unknown calculation type: " + test.getCalculationType());
         }
@@ -111,8 +111,17 @@ public class GradeCalculator {
     
     /**
      * Calculate grade using PENALTY method.
-     * Formula: grade = 100 - ((rawResult - targetValue) * penaltyPerUnit)
-     * 
+     * Formula: grade = 100 - ((rawResult - targetValue) / penaltyUnit) * penaltyPerUnit
+     *
+     * The penaltyUnit defines the size of one deduction interval. For TIME tests it lets
+     * the teacher deduct points per arbitrary interval (e.g. penaltyUnit = 0.75 minutes = 45s),
+     * so every 45 seconds over target costs penaltyPerUnit points. When penaltyUnit is null
+     * or non-positive it defaults to 1, which reduces to the classic
+     * grade = 100 - (deviation * penaltyPerUnit) used by COUNT tests.
+     *
+     * Example: target 10:30 (10.5), result 11:45 (11.75), penaltyPerUnit 5, penaltyUnit 0:45 (0.75)
+     *   deviation = 1.25, units = 1.25 / 0.75 = 1.667, grade = 100 - 1.667 * 5 = 91.67
+     *
      * Requirements:
      * - 5.1: Apply penalty formula
      * - 5.2: Support non-integer values
@@ -120,14 +129,16 @@ public class GradeCalculator {
      * - 5.4: Cap at 0 (no negative grades)
      * - 5.5: Linear calculation for all deviations
      * - 5.6: Round to 2 decimal places
-     * 
+     *
      * @param rawResult Raw test result (must be non-null and non-negative)
      * @param targetValue Target value for 100% grade (must be positive)
-     * @param penaltyPerUnit Penalty per unit deviation from target (must be positive)
+     * @param penaltyPerUnit Penalty per deduction unit (must be positive)
+     * @param penaltyUnit Size of one deduction interval; defaults to 1 if null or non-positive
      * @return Calculated grade (0-100, rounded to 2 decimal places)
      * @throws IllegalArgumentException if parameters are invalid
      */
-    public BigDecimal calculatePenaltyGrade(BigDecimal rawResult, BigDecimal targetValue, BigDecimal penaltyPerUnit) {
+    public BigDecimal calculatePenaltyGrade(BigDecimal rawResult, BigDecimal targetValue,
+                                            BigDecimal penaltyPerUnit, BigDecimal penaltyUnit) {
         // Validate inputs
         if (rawResult == null) {
             throw new IllegalArgumentException("Raw result cannot be null");
@@ -147,10 +158,16 @@ public class GradeCalculator {
         if (rawResult.compareTo(ZERO) < 0) {
             throw new IllegalArgumentException("Raw result cannot be negative");
         }
-        
-        // Calculate: 100 - ((rawResult - targetValue) * penaltyPerUnit)
+
+        // Default penaltyUnit to 1 (classic per-unit penalty) when missing or non-positive
+        BigDecimal effectivePenaltyUnit = (penaltyUnit != null && penaltyUnit.compareTo(ZERO) > 0)
+                ? penaltyUnit
+                : BigDecimal.ONE;
+
+        // Calculate: 100 - ((rawResult - targetValue) / penaltyUnit) * penaltyPerUnit
         BigDecimal deviation = rawResult.subtract(targetValue);
-        BigDecimal penalty = deviation.multiply(penaltyPerUnit);
+        BigDecimal units = deviation.divide(effectivePenaltyUnit, 4, ROUNDING_MODE);
+        BigDecimal penalty = units.multiply(penaltyPerUnit);
         BigDecimal grade = ONE_HUNDRED.subtract(penalty);
         
         // Cap at 100 (no bonus above 100) (Requirement 5.3)

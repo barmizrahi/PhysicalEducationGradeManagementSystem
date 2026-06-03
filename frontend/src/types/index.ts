@@ -51,6 +51,7 @@ export interface Test {
   maxValue: number | null // For RATIO calculation
   targetValue: number | null // For PENALTY calculation
   penaltyPerUnit: number | null // For PENALTY calculation
+  penaltyUnit: number | null // For PENALTY + TIME: deduction interval in decimal minutes
   createdBy: number
   createdAt: string
   updatedAt: string
