@@ -375,40 +375,41 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
     })));
   }, [selectedTest, gradeEntries, bulkRawResult, validateRawResult, calculateGrade, t]);
 
-  // Save grades
-  const saveGrades = async () => {
+  // Save grades.
+  // isAutoSave=true is used by the 30s background auto-save: in that case we skip
+  // silently when there are validation errors or nothing to save, so the top-level
+  // red error box never pops up on its own (per-field inline errors already inform
+  // the user). Manual save (button click) still surfaces those messages.
+  const saveGrades = async (isAutoSave = false) => {
     if (!selectedTest) return;
+
+    const hasErrors = gradeEntries.some(entry => entry.error);
+
+    // Prepare results to save
+    const resultsToSave = gradeEntries
+      .filter(entry => entry.rawResult.trim() !== '' || entry.notes.trim() !== '')
+      .map(entry => {
+        const validation = validateRawResult(entry.rawResult, selectedTest.unitType);
+
+        return {
+          studentId: entry.student.id,
+          testId: selectedTest.id,
+          rawResult: validation.numericValue, // Can be null if only notes
+          notes: entry.notes.trim() || null,
+        };
+      });
+
+    if (hasErrors || resultsToSave.length === 0) {
+      if (!isAutoSave) {
+        setError(hasErrors ? t('validation.invalidFormat') : t('grades.noGrades'));
+      }
+      return;
+    }
 
     try {
       setSaving(true);
       setError('');
       setSuccessMessage('');
-
-      // Validate all entries
-      const hasErrors = gradeEntries.some(entry => entry.error);
-      if (hasErrors) {
-        setError(t('validation.invalidFormat'));
-        return;
-      }
-
-      // Prepare results to save
-      const resultsToSave = gradeEntries
-        .filter(entry => entry.rawResult.trim() !== '' || entry.notes.trim() !== '')
-        .map(entry => {
-          const validation = validateRawResult(entry.rawResult, selectedTest.unitType);
-          
-          return {
-            studentId: entry.student.id,
-            testId: selectedTest.id,
-            rawResult: validation.numericValue, // Can be null if only notes
-            notes: entry.notes.trim() || null,
-          };
-        });
-
-      if (resultsToSave.length === 0) {
-        setError(t('grades.noGrades'));
-        return;
-      }
 
       // Bulk save
       await gradesApi.bulkSaveTestResults(resultsToSave);
@@ -449,7 +450,7 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
   const debouncedSave = useCallback(
     debounce(() => {
       if (hasUnsavedChanges) {
-        saveGrades();
+        saveGrades(true); // auto-save: fail silently on validation errors / empty
       }
     }, 30000), // 30 seconds
     [hasUnsavedChanges]
@@ -767,11 +768,8 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
               )}
             </div>
             <div className="flex gap-2">
-              {hasUnsavedChanges && (
-                <span className="text-sm text-orange-600">{t('common.reset')}</span>
-              )}
               <Button
-                onClick={saveGrades}
+                onClick={() => saveGrades()}
                 loading={saving}
                 disabled={saving || !hasUnsavedChanges}
                 size="sm"
@@ -867,7 +865,7 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
           {/* Bottom Save Button */}
           <div className="mt-4 flex justify-end">
             <Button
-              onClick={saveGrades}
+              onClick={() => saveGrades()}
               loading={saving}
               disabled={saving || !hasUnsavedChanges}
               fullWidth
