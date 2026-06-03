@@ -549,6 +549,7 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
     );
   }
 
+  // @ts-ignore
   return (
     <div className={`p-4 ${className}`}>
       {/* Header */}
@@ -636,55 +637,115 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
           </div>
         </div>
       )}
-
-      {/* Bulk Actions Section */}
-      {selectedClassIds.length > 0 && selectedTestId && selectedTest && gradeEntries.length > 0 && (
-        <div className="mb-4 rounded-md bg-blue-50 border border-blue-200 p-4">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-text-primary">{t('grades.bulkActions')}</h3>
-              <span className="text-xs text-text-secondary">
+      {/*
+      {selectedClassIds.length > 0 && selectedTestId && selectedTest && gradeEntries.length > 0 &&(
+          <div className="mb-4 rounded-md bg-blue-50 border border-blue-200 p-4">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-text-primary">{t('grades.bulkActions')}</h3>
+                <span className="text-xs text-text-secondary">
                 {gradeEntries.filter(e => e.selected).length} {t('common.selected', { defaultValue: 'נבחרו' })}
               </span>
-            </div>
-            
-            <div className="flex flex-col gap-3 md:flex-row md:items-end">
-              <div className="flex-1">
-                <Input
-                  label={`${t('grades.grade')} ${selectedTest.unitType === 'TIME' ? '(mm:ss)' : ''}`}
-                  type="text"
-                  inputMode={selectedTest.unitType === 'TIME' ? 'text' : 'decimal'}
-                  value={bulkRawResult}
-                  onChange={(e) => handleBulkRawResultChange(e.target.value)}
-                  error={bulkError}
-                  placeholder={selectedTest.unitType === 'TIME' ? '10:30' : '0'}
-                  fullWidth
-                />
               </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={applyBulkRawResult}
-                  disabled={gradeEntries.filter(e => e.selected).length === 0 || !bulkRawResult.trim()}
-                  size="sm"
-                  variant="primary"
-                >
-                  {t('common.submit')}
-                </Button>
-                <Button
-                  onClick={handleSelectAll}
-                  size="sm"
-                  variant="secondary"
-                >
-                  {gradeEntries.every(e => e.selected) ? t('grades.deselectAll') : t('grades.selectAll')}
-                </Button>
+
+              <div className="flex flex-col gap-3 md:flex-row md:items-end">
+                <div className="flex-1">
+                  <Input
+                      label={`${t('grades.grade')} ${selectedTest.unitType === 'TIME' ? '(mm:ss)' : ''}`}
+                      type="text"
+                      inputMode={selectedTest.unitType === 'TIME' ? 'text' : 'decimal'}
+                      value={bulkRawResult}
+                      onChange={(e) => handleBulkRawResultChange(e.target.value)}
+                      error={bulkError}
+                      placeholder={selectedTest.unitType === 'TIME' ? '10:30' : '0'}
+                      fullWidth
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                      onClick={applyBulkRawResult}
+                      disabled={gradeEntries.filter(e => e.selected).length === 0 || !bulkRawResult.trim()}
+                      size="sm"
+                      variant="primary"
+                  >
+                    {t('common.submit')}
+                  </Button>
+                  <Button
+                      onClick={handleSelectAll}
+                      size="sm"
+                      variant="secondary"
+                  >
+                    {gradeEntries.every(e => e.selected) ? t('grades.deselectAll') : t('grades.selectAll')}
+                  </Button>
+                </div>
               </div>
+
+              <p className="text-xs text-text-secondary">
+                {t('common.filter')}
+              </p>
             </div>
-            
-            <p className="text-xs text-text-secondary">
-              {t('common.filter')}
-            </p>
           </div>
-        </div>
+      )}}
+      {/* Bulk Actions Section - Hidden but functionality kept for future */}
+      {false && (
+          <div className="mb-4 rounded-md bg-blue-50 border border-blue-200 p-4">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-text-primary">
+                  {t('grades.bulkActions')}
+                </h3>
+                <span className="text-xs text-text-secondary">
+          {gradeEntries.filter(e => e.selected).length}{' '}
+                  {t('common.selected', { defaultValue: 'נבחרו' })}
+        </span>
+              </div>
+
+              <div className="flex flex-col gap-3 md:flex-row md:items-end">
+                <div className="flex-1">
+                  <Input
+                      label={`${t('grades.grade')} ${
+                          selectedTest?.unitType === 'TIME' ? '(mm:ss)' : ''
+                      }`}
+                      type="text"
+                      inputMode={selectedTest?.unitType === 'TIME' ? 'text' : 'decimal'}
+                      value={bulkRawResult}
+                      onChange={(e) => handleBulkRawResultChange(e.target.value)}
+                      error={bulkError}
+                      placeholder={selectedTest?.unitType === 'TIME' ? '10:30' : '0'}
+                      fullWidth
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                      onClick={applyBulkRawResult}
+                      disabled={
+                          gradeEntries.filter(e => e.selected).length === 0 ||
+                          !bulkRawResult.trim()
+                      }
+                      size="sm"
+                      variant="primary"
+                  >
+                    {t('common.submit')}
+                  </Button>
+
+                  <Button
+                      onClick={handleSelectAll}
+                      size="sm"
+                      variant="secondary"
+                  >
+                    {gradeEntries.every(e => e.selected)
+                        ? t('grades.deselectAll')
+                        : t('grades.selectAll')}
+                  </Button>
+                </div>
+              </div>
+
+              <p className="text-xs text-text-secondary">
+                {t('common.filter')}
+              </p>
+            </div>
+          </div>
       )}
 
       {/* Grade Entry Table */}
@@ -722,20 +783,22 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
                   entry.selected ? 'border-primary-color ring-2 ring-primary-color ring-opacity-50' : 'border-border-color'
                 }`}
               >
-                {/* Student Info with Checkbox */}
-                <div className="mb-3 pb-2 border-b border-border-color">
+                {/* Student Info - Checkbox hidden but functionality kept */}
+                <div className="mb-3 pb-2 border-border-color">
                   <div className="flex justify-between items-start">
                     <div className="flex items-start gap-3">
-                      {/* Selection Checkbox */}
-                      <div className="pt-1">
-                        <input
-                          type="checkbox"
-                          checked={entry.selected}
-                          onChange={() => handleStudentSelect(entry.student.id)}
-                          className="h-5 w-5 rounded border-border-color text-primary-color focus:ring-primary-color cursor-pointer"
-                          aria-label={`Select ${entry.student.name}`}
-                        />
-                      </div>
+                      {/* Selection Checkbox - Hidden */}
+                      {false && (
+                        <div className="pt-1">
+                          <input
+                            type="checkbox"
+                            checked={entry.selected}
+                            onChange={() => handleStudentSelect(entry.student.id)}
+                            className="h-5 w-5 rounded border-border-color text-primary-color focus:ring-primary-color cursor-pointer"
+                            aria-label={`Select ${entry.student.name}`}
+                          />
+                        </div>
+                      )}
                       <div>
                         <h3 className="font-medium text-text-primary">{entry.student.name}</h3>
                         <p className="text-sm text-text-secondary">
@@ -780,7 +843,7 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
                   <div>
                     <Input
                       ref={(el) => { inputRefs.current[`notes-${entry.student.id}`] = el; }}
-                      label={`${t('common.add')} (${t('form.optional')})`}
+                      label="הוסף הערה (אופציונלי)"
                       type="text"
                       value={entry.notes}
                       onChange={(e) => handleNotesChange(entry.student.id, e.target.value)}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Test, CalculationType, UnitType } from '../types';
 import { Button, Input, Select, ErrorMessage } from './ui';
+import { parseTimeToDecimal, isValidTimeFormat } from '../utils/helpers';
 
 export interface TestFormProps {
   /**
@@ -130,9 +131,22 @@ export const TestForm: React.FC<TestFormProps> = ({
       if (!targetValue.trim()) {
         errors.targetValue = t('testForm.targetValueRequired');
       } else {
-        const targetValueNum = parseFloat(targetValue);
-        if (isNaN(targetValueNum) || targetValueNum < 0) {
-          errors.targetValue = t('testForm.targetValueNonNegative');
+        // Handle TIME format validation
+        if (unitType === 'TIME') {
+          if (!isValidTimeFormat(targetValue)) {
+            errors.targetValue = 'פורמט לא תקין. השתמש ב-mm:ss (לדוגמה: 10:30)';
+          } else {
+            const targetValueNum = parseTimeToDecimal(targetValue);
+            if (targetValueNum === null || targetValueNum < 0) {
+              errors.targetValue = t('testForm.targetValueNonNegative');
+            }
+          }
+        } else {
+          // COUNT type - validate as number
+          const targetValueNum = parseFloat(targetValue);
+          if (isNaN(targetValueNum) || targetValueNum < 0) {
+            errors.targetValue = t('testForm.targetValueNonNegative');
+          }
         }
       }
 
@@ -162,7 +176,9 @@ export const TestForm: React.FC<TestFormProps> = ({
       calculationType,
       unitType,
       maxValue: calculationType === 'RATIO' ? parseFloat(maxValue) : null,
-      targetValue: calculationType === 'PENALTY' ? parseFloat(targetValue) : null,
+      targetValue: calculationType === 'PENALTY' 
+        ? (unitType === 'TIME' ? parseTimeToDecimal(targetValue) : parseFloat(targetValue))
+        : null,
       penaltyPerUnit: calculationType === 'PENALTY' ? parseFloat(penaltyPerUnit) : null,
     };
 
@@ -243,13 +259,14 @@ export const TestForm: React.FC<TestFormProps> = ({
         <>
           <Input
             label={t('testForm.targetValue')}
-            type="number"
-            step="0.01"
+            type={unitType === 'TIME' ? 'text' : 'number'}
+            step={unitType === 'TIME' ? undefined : '0.01'}
+            inputMode={unitType === 'TIME' ? 'text' : 'decimal'}
             value={targetValue}
             onChange={(e) => setTargetValue(e.target.value)}
             error={formErrors.targetValue}
-            helperText={t('testForm.targetValueHelper')}
-            placeholder={t('testForm.targetValuePlaceholder')}
+            helperText={unitType === 'TIME' ? 'פורמט: mm:ss (לדוגמה: 10:30)' : t('testForm.targetValueHelper')}
+            placeholder={unitType === 'TIME' ? '10:30' : t('testForm.targetValuePlaceholder')}
             fullWidth
             required
             disabled={loading}
