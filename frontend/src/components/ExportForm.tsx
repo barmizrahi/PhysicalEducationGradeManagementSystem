@@ -135,10 +135,30 @@ export const ExportForm: React.FC<ExportFormProps> = ({
 
       const blob = await exportApi.exportGrades(exportConfig);
       
-      // Generate filename with timestamp
+      // Build a descriptive filename: test name + selected class names + date,
+      // so the teacher can tell from the filename what the file contains
+      // (a single file may hold several classes for the same test).
       const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `grades_export_${timestamp}.xlsx`;
-      
+
+      const exportedTest = tests.find(tst => tst.id.toString() === selectedTestId);
+      const testName = exportedTest?.name || t('tests.testName');
+
+      const selectedClassLabels = classOptions
+        .filter(opt => selectedClassIds.includes(opt.value))
+        .map(opt => opt.label);
+
+      // Sanitize a part for use in a filename: drop illegal chars, collapse spaces
+      const sanitize = (s: string) =>
+        s.replace(/[\\/:*?"<>|]/g, '').replace(/\s*-\s*/g, '-').replace(/\s+/g, '_').trim();
+
+      // List up to 3 classes by name; summarize the rest to keep the filename short
+      const classesPart =
+        selectedClassLabels.length <= 3
+          ? selectedClassLabels.map(sanitize).join('_')
+          : `${selectedClassLabels.slice(0, 3).map(sanitize).join('_')}_ועוד-${selectedClassLabels.length - 3}`;
+
+      const filename = `ציונים_${sanitize(testName)}_${classesPart}_${timestamp}.xlsx`;
+
       exportApi.downloadExportedFile(blob, filename);
 
       if (onExportComplete) {

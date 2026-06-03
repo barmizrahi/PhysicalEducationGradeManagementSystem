@@ -25,3 +25,6 @@ export type { ErrorMessageProps } from './ErrorMessage';
 
 export { LoadingSpinner } from './LoadingSpinner';
 export type { LoadingSpinnerProps } from './LoadingSpinner';
+
+export { Toast } from './Toast';
+export type { ToastProps } from './Toast';

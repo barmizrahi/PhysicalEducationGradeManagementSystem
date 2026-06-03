@@ -4,7 +4,7 @@ import { Student, Test, UnitType } from '../types';
 import { studentsApi } from '../api/students';
 import { testsApi } from '../api/tests';
 import { gradesApi } from '../api/grades';
-import { Select, Input, Button, LoadingSpinner, ErrorMessage } from './ui';
+import { Select, Input, Button, LoadingSpinner, ErrorMessage, Toast } from './ui';
 import {
   parseTimeToDecimal,
   formatTimeFromDecimal,
@@ -630,21 +630,12 @@ export const GradeEntry: React.FC<GradeEntryProps> = ({ className = '' }) => {
         </div>
       )}
 
-      {/* Success Message */}
-      {successMessage && (
-        <div className="mb-4 rounded-md bg-green-50 border border-success-color p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-success-color" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-green-700">{successMessage}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Success Message - floating toast near the bottom, close to the save button */}
+      <Toast
+        message={successMessage || null}
+        type="success"
+        onClose={() => setSuccessMessage('')}
+      />
       {/*
       {selectedClassIds.length > 0 && selectedTestId && selectedTest && gradeEntries.length > 0 &&(
           <div className="mb-4 rounded-md bg-blue-50 border border-blue-200 p-4">

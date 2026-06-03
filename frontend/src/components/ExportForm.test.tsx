@@ -80,7 +80,7 @@ describe('ExportForm', () => {
       });
       expect(exportApi.downloadExportedFile).toHaveBeenCalledWith(
         mockBlob,
-        expect.stringMatching(/grades_export_\d{4}-\d{2}-\d{2}\.xlsx/)
+        expect.stringMatching(/ציונים_.*_\d{4}-\d{2}-\d{2}\.xlsx/)
       );
       expect(mockOnExportComplete).toHaveBeenCalled();
     });
