@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 
  
@@ -18,11 +19,11 @@ interface ToastProps {
 
 const TOAST_STYLES = {
 
-  success: 'bg-green-100 border-green-400',
+  success: 'bg-green-50 border-green-500 shadow-green-200',
 
-  error: 'bg-red-100 border-red-400',
+  error: 'bg-red-50 border-red-500 shadow-red-200',
 
-  info: 'bg-blue-100 border-blue-400',
+  info: 'bg-blue-50 border-blue-500 shadow-blue-200',
 
 };
 
@@ -30,11 +31,11 @@ const TOAST_STYLES = {
 
 const TOAST_ICONS = {
 
-  success: '✅',
+  success: '🎉',
 
-  error: '❌',
+  error: '🚨',
 
-  info: 'ℹ️',
+  info: '💡',
 
 };
 
@@ -78,58 +79,96 @@ export const Toast: React.FC<ToastProps> = ({
 
   return (
 
-    <div
+    <>
 
-      dir="rtl"
+      {/* Backdrop overlay */}
 
-      className={`
+      <div
 
-        fixed bottom-6 right-6 z-[100]
+        className="fixed inset-0 z-[99] bg-black/30 backdrop-blur-sm"
 
-        min-w-[300px] max-w-md
+        onClick={onClose}
 
-        ${currentStyle}
+      />
 
-        border-2 text-black rounded-xl shadow-2xl
+ 
 
-        flex items-center justify-between
+      {/* Toast popup */}
 
-        px-5 py-4
+      <div
 
-      `}
+        dir="rtl"
 
-    >
+        className={`
 
-      <div className="flex items-center gap-3 flex-1">
+          fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
 
-        <div className="text-2xl">{icon}</div>
+          z-[100]
 
-        <p className="text-base font-medium leading-tight flex-1 text-black">
+          w-[420px] max-w-[90vw]
+
+          ${currentStyle}
+
+          border-4 rounded-2xl
+
+          shadow-[0_20px_60px_rgba(0,0,0,0.3)]
+
+          px-8 py-8
+
+          flex flex-col items-center gap-4
+
+          animate-[bounceIn_0.4s_ease-out]
+
+        `}
+
+      >
+
+        {/* Big icon */}
+
+        <div className="text-6xl">{icon}</div>
+
+ 
+
+        {/* Message */}
+
+        <p className="text-xl font-bold text-center text-gray-900 leading-relaxed">
 
           {message}
 
         </p>
 
-      </div>
-
  
 
-      <button
+        {/* Close button */}
 
-        onClick={onClose}
+        <button
 
-        className="mr-4 text-2xl leading-none text-black/70 hover:text-black transition-colors font-bold"
+          onClick={onClose}
 
-        aria-label="סגור"
+          className="
 
-      >
+            mt-2 px-6 py-2
 
-        ×
+            bg-gray-800 text-white
 
-      </button>
+            rounded-lg text-base font-medium
 
-    </div>
+            hover:bg-gray-900 transition-colors
+
+          "
+
+        >
+
+          סגור
+
+        </button>
+
+      </div>
+
+    </>
 
   );
 
 };
+*
+ 
