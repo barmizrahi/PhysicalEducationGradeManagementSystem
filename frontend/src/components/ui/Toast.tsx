@@ -105,7 +105,7 @@ export const Toast: React.FC<ToastProps> = ({
 
           z-[100]
 
-          w-[420px] max-w-[90vw]
+          w-[90vw] max-w-[420px]
 
           ${currentStyle}
 
