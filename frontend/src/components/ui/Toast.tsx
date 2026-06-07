@@ -11,30 +11,42 @@ export const Toast: React.FC<ToastProps> = ({
   message,
   type = 'success',
   onClose,
-  duration = 4000,
+  duration = 5000,
 }) => {
   useEffect(() => {
     if (!message) return;
 
-    const timer = setTimeout(() => {
-      onClose();
-    }, duration);
-
+    const timer = setTimeout(onClose, duration);
     return () => clearTimeout(timer);
   }, [message, onClose, duration]);
 
   if (!message) return null;
 
-  const bgColor = 
-    type === 'success' ? 'bg-green-500' : 
-    type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+  const styles = {
+    success: 'bg-green-600 border-green-700',
+    error: 'bg-red-600 border-red-700',
+    info: 'bg-blue-600 border-blue-700',
+  };
+
+  const currentStyle = styles[type] || styles.success;
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white flex items-center gap-2 ${bgColor}`}>
-      <span>{message}</span>
-      <button 
+    <div className={`fixed bottom-6 right-6 z-[100] min-w-[300px] max-w-md 
+                     ${currentStyle} border-2 text-white rounded-xl shadow-2xl 
+                     flex items-center justify-between px-5 py-4`}>
+      <div className="flex items-center gap-3 flex-1">
+        <div className="text-2xl">
+          {type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+        </div>
+        <p className="text-base font-medium leading-tight flex-1">
+          {message}
+        </p>
+      </div>
+      
+      <button
         onClick={onClose}
-        className="ml-2 text-white hover:text-gray-200 text-xl leading-none font-bold"
+        className="ml-4 text-2xl leading-none text-white/80 hover:text-white transition-colors font-bold"
+        aria-label="Close"
       >
         ×
       </button>
